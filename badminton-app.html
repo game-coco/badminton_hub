@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>BadmintonHub 🏸</title>
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ─── RESET ─────────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Prompt',-apple-system,BlinkMacSystemFont,sans-serif;background:#f1f5f9;color:#1e293b;min-height:100vh;-webkit-font-smoothing:antialiased}
+
+/* ─── VARS ───────────────────────────────────────────────── */
+:root{
+  --g1:#064e3b;--g2:#047857;--g3:#059669;
+  --am1:#d97706;--am2:#f59e0b;
+  --bl1:#1d4ed8;--bl2:#3b82f6;
+  --red:#ef4444;
+  --gray:#64748b;--gray-l:#f1f5f9;--gray-b:#e2e8f0;
+  --card-r:18px;--card-r-lg:24px;--card-r-xl:28px;
+  --sh-sm:0 1px 4px rgba(0,0,0,.06);
+  --sh:0 4px 16px rgba(0,0,0,.08);
+  --sh-lg:0 8px 30px rgba(0,0,0,.14);
+}
+
+/* ─── PAGE ROUTING ───────────────────────────────────────── */
+.page{display:none!important}.page.active{display:block!important}
+
+/* ─── NAVBAR ─────────────────────────────────────────────── */
+.nb{background:linear-gradient(135deg,var(--g1),var(--g2));position:sticky;top:0;z-index:100;box-shadow:0 4px 20px rgba(4,120,87,.35)}
+.nb.hidden{display:none!important}
+.nb-in{max-width:520px;margin:0 auto;padding:13px 16px;display:flex;align-items:center;justify-content:space-between}
+.nb-brand{display:flex;align-items:center;gap:8px;color:#fff;font-weight:800;font-size:18px;letter-spacing:-.3px;background:none;border:none;cursor:pointer;font-family:inherit}
+.nb-chip{background:rgba(255,255,255,.2);color:#fff;font-size:12px;font-weight:600;padding:5px 12px;border-radius:999px;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nb-home{background:none;border:none;color:rgba(255,255,255,.7);font-size:20px;cursor:pointer;padding:4px;font-family:inherit}
+
+/* ─── CONTAINER ──────────────────────────────────────────── */
+.wrap{max-width:520px;margin:0 auto;padding:16px;padding-bottom:80px}
+
+/* ─── CARDS ──────────────────────────────────────────────── */
+.card{background:#fff;border-radius:var(--card-r);padding:16px;box-shadow:var(--sh-sm);border:1px solid var(--gray-b);margin-bottom:12px}
+.card-lg{background:#fff;border-radius:var(--card-r-lg);padding:20px;box-shadow:var(--sh-sm);border:1px solid var(--gray-b);margin-bottom:12px}
+.card-p0{padding:0;overflow:hidden}
+.hero{border-radius:var(--card-r-lg);padding:22px;color:#fff;margin-bottom:16px}
+.hero-g{background:linear-gradient(135deg,var(--g1) 0%,var(--g2) 100%)}
+.hero-am{background:linear-gradient(135deg,var(--am1),var(--am2))}
+.hero-bl{background:linear-gradient(135deg,var(--bl1),var(--bl2))}
+
+/* ─── BUTTONS ────────────────────────────────────────────── */
+button{font-family:inherit;cursor:pointer;transition:all .15s}
+button:active{transform:scale(.97)}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px 18px;border-radius:var(--card-r);font-weight:700;font-size:15px;border:none;margin-bottom:8px;font-family:inherit}
+.btn:active{transform:scale(.97)}
+.btn-sm{padding:9px 15px;font-size:13px;border-radius:12px;width:auto;font-weight:600;margin-bottom:0}
+.btn-p{background:linear-gradient(135deg,#065f46,var(--g2));color:#fff;box-shadow:0 4px 14px rgba(4,120,87,.3)}
+.btn-p:hover{opacity:.9}
+.btn-s{background:var(--gray-l);color:#374151}
+.btn-s:hover{background:#e2e8f0}
+.btn-d{background:transparent;border:2px solid #fecaca;color:var(--red)}
+.btn-d:hover{background:#fef2f2}
+.btn-og{background:transparent;border:2px solid #6ee7b7;color:#065f46}
+.btn-og:hover{background:#ecfdf5}
+.btn-bl{background:linear-gradient(135deg,var(--bl1),var(--bl2));color:#fff;box-shadow:0 4px 14px rgba(59,130,246,.3)}
+.btn-am{background:linear-gradient(135deg,var(--am1),var(--am2));color:#fff}
+.btn-ghost{background:transparent;border:none;color:var(--gray);font-size:13px;padding:6px;width:auto;font-family:inherit}
+.btn-row{display:flex;gap:10px}
+.btn-row .btn,.btn-row button{flex:1;margin-bottom:0}
+
+/* ─── INPUTS ─────────────────────────────────────────────── */
+.inp{width:100%;border:2px solid var(--gray-b);border-radius:12px;padding:12px 15px;font-size:15px;font-family:inherit;outline:none;transition:border-color .2s;background:#fff;color:#1e293b}
+.inp:focus{border-color:var(--g2)}
+.inp-center{text-align:center;letter-spacing:.4em;font-size:28px;font-weight:900}
+select.inp{appearance:auto}
+.lbl{display:block;font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+
+/* ─── BADGES ─────────────────────────────────────────────── */
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;white-space:nowrap}
+.bg{background:#d1fae5;color:#065f46}
+.ba{background:#fef3c7;color:#92400e}
+.bb{background:#dbeafe;color:#1e40af}
+.bgr{background:#f1f5f9;color:#64748b}
+.br{background:#fee2e2;color:#991b1b}
+
+/* ─── AVATARS ────────────────────────────────────────────── */
+.av{width:46px;height:46px;min-width:46px;border-radius:50%;background:linear-gradient(135deg,#34d399,#059669);color:#fff;font-weight:900;font-size:18px;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(5,150,105,.3)}
+.av-sm{width:34px;height:34px;min-width:34px;font-size:14px}
+.av-num{background:#ecfdf5;color:#065f46;box-shadow:none;border:2px solid #a7f3d0;font-size:13px;font-weight:900}
+.av-bl{background:linear-gradient(135deg,#60a5fa,#2563eb);box-shadow:0 3px 10px rgba(37,99,235,.3)}
+.av-gray{background:#e2e8f0;color:#9ca3af;box-shadow:none}
+
+/* ─── FLEX HELPERS ───────────────────────────────────────── */
+.row{display:flex;align-items:center;gap:12px}
+.row-b{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.row-c{display:flex;align-items:center;justify-content:center;gap:8px}
+.f1{flex:1}
+
+/* ─── LIST ROWS ──────────────────────────────────────────── */
+.lr{display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid #f8fafc}
+.lr:last-child{border-bottom:none}
+.lh{padding:12px 16px;border-bottom:1px solid var(--gray-b);display:flex;justify-content:space-between;align-items:center}
+
+/* ─── STAT BAR ───────────────────────────────────────────── */
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
+.stat-box{background:rgba(255,255,255,.2);border-radius:16px;padding:12px 8px;text-align:center}
+.stat-n{font-size:30px;font-weight:900;color:#fff}
+.stat-l{font-size:11px;color:rgba(255,255,255,.7);margin-top:2px}
+
+/* ─── MENU GRID ──────────────────────────────────────────── */
+.menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.mc{background:#fff;border-radius:var(--card-r-lg);padding:20px;box-shadow:var(--sh-sm);border:1px solid var(--gray-b);cursor:pointer;transition:all .2s;text-align:left}
+.mc:hover{box-shadow:var(--sh);transform:translateY(-2px)}
+.mc:active{transform:scale(.97)}
+.mc-full{grid-column:1/-1;display:flex;align-items:center;gap:16px}
+.mc-icon{font-size:32px;margin-bottom:8px;display:block}
+.mc-title{font-weight:700;font-size:15px;color:#1e293b}
+.mc-sub{font-size:12px;color:#94a3b8;margin-top:2px}
+
+/* ─── LANDING ────────────────────────────────────────────── */
+.land{min-height:100vh;background:linear-gradient(160deg,var(--g1) 0%,var(--g2) 60%,var(--g3) 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center}
+.land-icon{font-size:90px;filter:drop-shadow(0 8px 16px rgba(0,0,0,.2));margin-bottom:16px}
+.land-title{font-size:48px;font-weight:900;color:#fff;letter-spacing:-1px;margin-bottom:6px}
+.land-sub{color:rgba(255,255,255,.6);font-size:16px;margin-bottom:48px}
+.land-btns{display:flex;flex-direction:column;gap:14px;width:100%;max-width:340px}
+.land-btn{display:flex;align-items:center;gap:16px;padding:18px 22px;border-radius:22px;border:none;cursor:pointer;transition:all .2s;text-align:left;font-family:inherit}
+.land-btn:active{transform:scale(.97)}
+.land-btn-p{background:#fff;color:#065f46;box-shadow:0 8px 30px rgba(0,0,0,.2)}
+.land-btn-a{background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.25);color:#fff}
+.land-emoji{font-size:38px}
+.land-bt{font-size:17px;font-weight:800}
+.land-bs{font-size:12px;font-weight:400;margin-top:2px}
+.land-btn-p .land-bs{color:#9ca3af}
+.land-btn-a .land-bs{color:rgba(255,255,255,.6)}
+.land-arr{margin-left:auto;font-size:20px;opacity:.4}
+.land-foot{color:rgba(255,255,255,.3);font-size:12px;margin-top:32px}
+
+/* ─── PLAYER SELECT ──────────────────────────────────────── */
+.ps-hd{background:linear-gradient(135deg,var(--g1),var(--g2));padding:48px 24px 32px;text-align:center;color:#fff}
+.ps-bd{max-width:520px;margin:0 auto;padding:16px}
+.pi{background:#fff;border:2px solid var(--gray-b);border-radius:var(--card-r);padding:14px 16px;display:flex;align-items:center;gap:13px;cursor:pointer;transition:all .15s;margin-bottom:8px}
+.pi:hover{border-color:var(--g2);box-shadow:0 4px 16px rgba(4,120,87,.1)}
+.pi:active{transform:scale(.98)}
+.pi-name{font-size:17px;font-weight:700;color:#1e293b;flex:1}
+.pi-arr{color:#cbd5e1;font-size:20px}
+.pi-add{width:100%;border:2px dashed #a7f3d0;background:transparent;color:var(--g2);border-radius:var(--card-r);padding:16px;font-size:15px;font-weight:600;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:8px;cursor:pointer;transition:background .15s}
+.pi-add:hover{background:#ecfdf5}
+
+/* ─── CALENDAR ───────────────────────────────────────────── */
+.cal-nav{display:flex;align-items:center;justify-content:space-between;padding:12px 0 8px}
+.cal-btn{width:42px;height:42px;border-radius:50%;background:#fff;box-shadow:var(--sh-sm);border:1px solid var(--gray-b);display:flex;align-items:center;justify-content:center;font-size:16px;color:#374151;cursor:pointer}
+.cal-btn:hover{background:#f8fafc}
+.cal-month{font-size:18px;font-weight:800;color:#1e293b}
+.cal-wrap{background:#fff;border-radius:var(--card-r-lg);padding:16px;box-shadow:var(--sh-sm);border:1px solid var(--gray-b);margin-bottom:12px}
+.cal-wdays{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:6px}
+.cal-wd{text-align:center;font-size:11px;font-weight:700;color:#94a3b8;padding:4px}
+.cal-wd.sun{color:#f87171}.cal-wd.sat{color:#60a5fa}
+.cal-cells{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cc{aspect-ratio:1;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:13px;font-weight:600;transition:all .15s;min-height:38px;position:relative}
+.cc.open{background:#d1fae5;border:2px solid #10b981;cursor:pointer;color:#065f46}
+.cc.open:hover{background:#a7f3d0}
+.cc.reg{background:#fef3c7;border:2px solid #f59e0b;cursor:pointer;color:#92400e}
+.cc.reg:hover{background:#fde68a}
+.cc.wi{background:#dbeafe;border:2px solid #60a5fa;cursor:pointer;color:#1e40af}
+.cc.wi:hover{background:#bfdbfe}
+.cc.past{color:#cbd5e1}
+.cc.today{outline:3px solid #3b82f6;outline-offset:1px}
+.cc-dot{width:5px;height:5px;border-radius:50%;margin-top:1px}
+.dot-g{background:#10b981}.dot-a{background:#f59e0b}.dot-b{background:#3b82f6}
+.cal-leg{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:#94a3b8;margin-bottom:16px;padding:0 2px}
+.cal-leg-i{display:flex;align-items:center;gap:5px}
+.leg-d{width:10px;height:10px;border-radius:3px;border:2px solid}
+.ev-card{background:#fff;border-radius:var(--card-r);padding:16px;box-shadow:var(--sh-sm);border:1px solid var(--gray-b);cursor:pointer;transition:all .15s;margin-bottom:10px}
+.ev-card:hover{box-shadow:var(--sh)}
+.ev-card:active{transform:scale(.99)}
+
+/* ─── MATCH ──────────────────────────────────────────────── */
+.match-card{background:#fff;border-radius:var(--card-r);overflow:hidden;box-shadow:var(--sh-sm);border:1px solid var(--gray-b);margin-bottom:10px}
+.match-hd{background:#fffbeb;padding:10px 16px;border-bottom:1px solid #fef3c7}
+.match-bd{padding:14px}
+.teams{display:flex;align-items:center;gap:10px}
+.team{flex:1;border-radius:14px;padding:12px;text-align:center}
+.tg{background:#ecfdf5;border:1px solid #a7f3d0}
+.tb{background:#eff6ff;border:1px solid #bfdbfe}
+.t-name{font-weight:700;font-size:15px}
+.t-name.green{color:#065f46}.t-name.blue{color:#1e40af}
+.vs{font-weight:900;font-size:18px;color:#cbd5e1;flex-shrink:0}
+.sits{text-align:center;margin-top:10px;font-size:12px;color:#94a3b8}
+.num-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.num-item{background:#f8fafc;border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:10px}
+
+/* ─── COST ───────────────────────────────────────────────── */
+.cost-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.cost-box{border-radius:var(--card-r);padding:16px;text-align:center}
+.cg{background:#ecfdf5;border:1px solid #a7f3d0}
+.cb{background:#eff6ff;border:1px solid #bfdbfe}
+.ca{background:#fffbeb;border:1px solid #fde68a}
+.cr{background:#fef2f2;border:1px solid #fecaca}
+.cost-n{font-size:26px;font-weight:900;margin-bottom:2px}
+.cost-l{font-size:12px;color:#64748b}
+.sum-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f8fafc;font-size:14px}
+.sum-row:last-child{border-bottom:none}
+.sum-lbl{color:#64748b}
+.sum-val{font-weight:700;color:#1e293b}
+.sum-val.g{color:var(--g2)}.sum-val.r{color:var(--red)}.sum-val.b{color:var(--bl2)}
+
+/* ─── LOGIN ──────────────────────────────────────────────── */
+.login-bg{min-height:100vh;background:linear-gradient(160deg,var(--g1),var(--g2));display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+.login-box{background:#fff;border-radius:var(--card-r-xl);padding:28px;width:100%;max-width:320px;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+
+/* ─── MODAL ──────────────────────────────────────────────── */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:200;padding:20px}
+.modal.hidden{display:none!important}
+.modal-box{background:#fff;border-radius:var(--card-r-xl);padding:24px;width:100%;max-width:320px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+
+/* ─── EMPTY STATE ────────────────────────────────────────── */
+.empty{text-align:center;padding:40px 20px}
+.empty-ico{font-size:52px;margin-bottom:12px;opacity:.7}
+.empty-txt{color:#94a3b8;font-size:14px}
+
+/* ─── TOAST ──────────────────────────────────────────────── */
+#toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#0f172a;color:#fff;padding:12px 24px;border-radius:999px;font-size:14px;font-weight:600;box-shadow:0 8px 30px rgba(0,0,0,.3);z-index:999;white-space:nowrap;max-width:90vw;text-align:center}
+#toast.hidden{display:none}
+
+/* ─── UTILS ──────────────────────────────────────────────── */
+.tc{text-align:center}.tr{text-align:right}
+.t-xs{font-size:11px}.t-sm{font-size:13px}.t-lg{font-size:18px}.t-xl{font-size:22px}.t-2xl{font-size:28px}.t-3xl{font-size:36px}
+.fw6{font-weight:600}.fw7{font-weight:700}.fw9{font-weight:900}
+.text-w{color:#fff}.text-gray{color:#64748b}.text-g{color:var(--g2)}.text-r{color:var(--red)}.text-b{color:var(--bl2)}.text-am{color:#d97706}.text-muted{color:#94a3b8}
+.mt1{margin-top:4px}.mt2{margin-top:8px}.mt3{margin-top:12px}.mt4{margin-top:16px}
+.mb1{margin-bottom:4px}.mb2{margin-bottom:8px}.mb3{margin-bottom:12px}.mb4{margin-bottom:16px}
+.w100{width:100%}.hidden{display:none!important}
+.divider{height:1px;background:#f1f5f9;margin:4px 0}
+.slip-img{width:100%;border-radius:14px;border:1px solid var(--gray-b);display:block;margin-bottom:12px}
+input[type=file]::file-selector-button{background:var(--g2);color:#fff;border:none;padding:7px 14px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:13px;margin-right:10px}
+.slide-up{animation:slideUp .3s ease-out}
+@keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.shake{animation:shake .35s ease-in-out}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+</style>
+</head>
+<body>
+
+<!-- ╔══════════════════════════════════════════════════════╗ -->
+<!-- ║  NAVBAR                                              ║ -->
+<!-- ╚══════════════════════════════════════════════════════╝ -->
+<nav class="nb hidden" id="navbar">
+  <div class="nb-in">
+    <button class="nb-brand" onclick="goHome()"><span>🏸</span><span>BadmintonHub</span></button>
+    <div class="row" style="gap:8px">
+      <span class="nb-chip" id="nav-user"></span>
+      <button class="nb-home" onclick="goHome()">🏠</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ╔══════════════════════════════════════════════════════╗ -->
+<!-- ║  LANDING                                             ║ -->
+<!-- ╚══════════════════════════════════════════════════════╝ -->
+<div id="page-landing" class="page active">
+  <div class="land">
+    <div class="land-icon">🏸</div>
+    <h1 class="land-title">BadmintonHub</h1>
+    <p class="land-sub">ระบบจัดการคอร์ทแบดมินตัน</p>
+    <div class="land-btns">
+      <button class="land-btn land-btn-p" onclick="goToPlayerSelect()">
+        <span class="land-emoji">👤</span>
+        <div><div class="land-bt">เข้าระบบผู้เล่น</div><div class="land-bs">จอง · ดูตาราง · ชำระเงิน</div></div>
+        <span class="land-arr">›</span>
+      </button>
+      <button class="land-btn land-btn-a" onclick="goToAdminLogin()">
+        <span class="land-emoji">⚙️</span>
+        <div><div class="land-bt">แอดมิน</div><div class="land-bs">จัดการระบบ · คิดเงิน · สุ่มคู่</div></div>
+        <span class="land-arr">›</span>
+      </button>
+    </div>
+    <p class="land-foot">v2.0 · สำหรับสมาชิก 10–20 คน</p>
+  </div>
+</div>
+
+<!-- ╔══════════════════════════════════════════════════════╗ -->
+<!-- ║  PLAYER SELECT                                       ║ -->
+<!-- ╚══════════════════════════════════════════════════════╝ -->
+<div id="page-playerSelect" class="page">
+  <div class="ps-hd">
+    <div style="font-size:52px;margin-bottom:12px">👋</div>
+    <h2 style="font-size:26px;font-weight:900;margin-bottom:4px">สวัสดี!</h2>
+    <p style="color:rgba(255,255,255,.7);font-size:14px">เลือกชื่อของคุณ</p>
+  </div>
+  <div class="ps-bd">
+    <div id="players-grid"></div>
+    <button class="pi-add" onclick="toggleAddForm()">
+      <span style="font-size:20px;font-weight:300">+</span> เพิ่มชื่อใหม่
+    </button>
+    <div id="add-form" class="card hidden" style="margin-top:8px">
+      <p class="t-sm text-gray mb2">ชื่อเล่นของคุณ</p>
+      <input id="new-name" class="inp mb3" type="text" placeholder="เช่น แบงค์, มิ้ง..." maxlength="20" onkeydown="if(event.key==='Enter')addPlayer()">
+      <div class="btn-row">
+        <button class="btn btn-p" onclick="addPlayer()">เพิ่ม</button>
+        <button class="btn btn-s" onclick="toggleAddForm()">ยกเลิก</button>
+      </div>
+    </div>
+    <button class="btn-ghost w100 tc mt3" onclick="showPage('landing')">← ย้อนกลับ</button>
+  </div>
+</div>
+
+<!-- ╔══════════════════════════════════════════════════════╗ -->
+<!-- ║  CALENDAR                                            ║ -->
+<!-- ╚══════════════════════════════════════════════════════╝ -->
+<div id="page-calendar" class="page">
+  <div class="wrap">
+    <div class="cal-nav">
+      <button class="cal-btn" onclick="prevMonth()">◀</button>
+      <span class="cal-month" id="cal-title"></span>
+      <button class="cal-btn" onclick="nextMonth()">▶</button>
+    </div>
+    <div class="cal-wrap">
+      <div class="cal-wdays">
+        <div class="cal-wd sun">อา</div><div class="cal-wd">จ</div><div class="cal-wd">อ</div>
+        <div class="cal-wd">พ</div><div class="cal-wd">พฤ</div><div class="cal-wd">ศ</div>
+        <div class="cal-wd sat">ส</div>
+      </div>
+      <div class="cal-cells" id="cal-cells"></div>
+    </div>
+    <div class="cal-leg">
+      <div class="cal-leg-i"><div class="leg-d" style="background:#d1fae5;border-color:#10b981"></div>เปิดจอง</div>
+      <div class="cal-leg-i"><div class="leg-d" style="background:#fef3c7;border-color:#f59e0b"></div>จองแล้ว</div>
+      <div class="cal-leg-i"><div class="leg-d" style="background:#dbeafe;border-color:#60a5fa"></div>Walk-in</div>
+    </div>
+    <p class="t-sm fw7 text-gray mb3" style="text-transform:uppercase;letter-spacing:.5px">วันเล่นที่กำลังจะมาถึง</p>
+    <div id="upcoming"></div>
+  </div>
+</div>
+
+<!-- ╔══════════════════════════════════════════════════════╗ -->
+<!-- ║  REGISTER / EVENT DETAIL                             ║ -->
+<!-- ╚══════════════════════════════════════════════════════╝ -->
+<div id="page-register" class="page">
+  <div class="wrap slide-up" id="reg-content"></div>
+</div>
+
+<!-- ╔══════════════════════════════════════════════════════╗ -->
+<!-- ║  WALK-IN                                             ║ -->
+<!-- ╚══════════════════════════════════════════════════════╝ -->
+<div id="page-walkin" class="page">
+  <div class="wrap slide-up">
+    <div class="tc mb4">
+      <div style="font-size:52px;margin-bottom:8px">🚶‍♂️</div>
+      <h2 style="font-size:22px;font-weight:900;margin-bottom:4px">Walk-In</h2>
+      <p class="t-sm text-muted">ลงทะเบียนหลังปิดรับจอง</p>
+    </div>
+    <div id="wi-content"></div>
+  </div>
+</div>
+
+<!-- ╔══════════════════════════════════════════════════════╗ -->
+<!-- ║  PAYMENT                                             ║ -->
+<!-- ╚══════════════════════════════════════════════════════╝ -->
+<div id="page-payment" class="page">
+  <div class="wrap slide-up" id="pay-content"></div>
+</div>
+
+<!-- ╔══════════════════════════════════════════════════════╗ -->
+<!-- ║  OVERVIEW                                            ║ -->
+<!-- ╚══════════════════════════════════════════════════════╝ -->
+<div id="page-overview" class="page">
+  <div class="wrap">
+    <h2 style="font-size:20px;font-weight:800;margin-bottom:16px">📊 ภาพรวมผู้เล่น</h2>
+    <div id="ov-content"></div>
+  </div>
+</div>
+
+<!-- ╔══════════════════════════════════════════════════════╗ -->
+<!-- ║  ADMIN LOGIN                                         ║ -->
+<!-- ╚══════════════════════════════════════════════════════╝ -->
+<div id="page-adminLogin" class="page">
+  <div class="login-bg">
+    <div class="tc text-w mb4">
+      <div style="font-size:60px;margin-bottom:12px">🔐</div>
+      <h2 style="font-size:24px;font-weight:900;margin-bottom:4px">แอดมิน</h2>
+      <p style="color:rgba(255,255,255,.6);font-size:14px">กรอก PIN เพื่อเข้าระบบ</p>
+    </div>
+    <div class="login-box">
+      <input id="admin-pin" class="inp inp-center mb3" type="password" placeholder="• • • •" maxlength="6" onkeydown="if(event.key==='Enter')adminLogin()">
+      <p id="pin-err" class="t-sm text-r tc mb3 hidden">PIN ไม่ถูกต้อง</p>
+      <button class="btn btn-p" onclick="adminLogin()">เข้าสู่ระบบ</button>
+      <button class="btn btn-ghost w100 tc mt1" style="font-size:14px" onclick="showPage('landing')">← ย้อนกลับ</button>
+    </div>
+  </div>
+</div>
+
+<!-- ╔══════════════════════════════════════════════════════╗ -->
+<!-- ║  ADMIN DASHBOARD                                     ║ -->
+<!-- ╚══════════════════════════════════════════════════════╝ -->
+<div id="page-adminDash" class="page">
+  <div class="wrap">
+    <div class="hero hero-g" style="border-radius:var(--card-r-xl)">
+      <div class="row-b mb3">
+        <div><h2 style="font-size:20px;font-weight:900">แอดมิน Dashboard</h2><p style="color:rgba(255,255,255,.65);font-size:13px;margin-top:2px">จัดการระบบทั้งหมด</p></div>
+        <span style="font-size:44px">⚙️</span>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-box"><div class="stat-n" id="s-players">0</div><div class="stat-l">ผู้เล่น</div></div>
+        <div class="stat-box"><div class="stat-n" id="s-events">0</div><div class="stat-l">วันเล่น</div></div>
+        <div class="stat-box"><div class="stat-n" id="s-unpaid">0</div><div class="stat-l">ค้างชำระ</div></div>
+      </div>
+    </div>
+    <div class="menu-grid">
+      <button class="mc" onclick="showPage('adminEvents')"><span class="mc-icon">📅</span><div class="mc-title">วันเล่น</div><div class="mc-sub">เพิ่ม / แก้ไข</div></button>
+      <button class="mc" onclick="showPage('adminCosts')"><span class="mc-icon">💰</span><div class="mc-title">คิดเงิน</div><div class="mc-sub">หารค่าคอร์ท</div></button>
+      <button class="mc" onclick="showPage('adminMatches')"><span class="mc-icon">🎯</span><div class="mc-title">สุ่มคู่</div><div class="mc-sub">จับคู่ผู้เล่น</div></button>
+      <button class="mc" onclick="showPage('adminPlayers')"><span class="mc-icon">👥</span><div class="mc-title">ผู้เล่น</div><div class="mc-sub">จัดการรายชื่อ</div></button>
+      <button class="mc mc-full" onclick="showPage('overview')"><span style="font-size:32px">📊</span><div><div class="mc-title">ภาพรวมผู้เล่น</div><div class="mc-sub">ดูตารางทุกวัน</div></div></button>
+      <button class="mc mc-full" onclick="showChangePin()" style="padding:14px 20px"><span style="font-size:24px">🔑</span><div class="mc-title" style="font-size:14px">เปลี่ยน PIN แอดมิน</div></button>
+    </div>
+  </div>
+  <div class="modal hidden" id="pin-modal">
+    <div class="modal-box">
+      <h3 class="fw7 mb3">เปลี่ยน PIN แอดมิน</h3>
+      <input id="new-pin" class="inp inp-center mb3" type="password" placeholder="PIN ใหม่ (4–6 หลัก)" maxlength="6">
+      <div class="btn-row">
+        <button class="btn btn-p" onclick="savePin()">บันทึก</button>
+        <button class="btn btn-s" onclick="hideChangePin()">ยกเลิก</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ╔══════════════════════════════════════════════════════╗ -->
+<!-- ║  ADMIN EVENTS                                        ║ -->
+<!-- ╚══════════════════════════════════════════════════════╝ -->
+<div id="page-adminEvents" class="page">
+  <div class="wrap">
+    <div class="row-b mb4">
+      <h2 style="font-size:20px;font-weight:800">📅 วันเล่น</h2>
+      <button class="btn btn-p btn-sm" onclick="toggleEvForm()">+ เพิ่มวัน</button>
+    </div>
+    <div id="ev-form" class="card-lg hidden mb4">
+      <h3 class="fw7 mb3">เพิ่มวันเล่นใหม่</h3>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div><label class="lbl">📅 วันที่เล่น *</label><input type="date" id="ef-date" class="inp"></div>
+        <div class="g2">
+          <div><label class="lbl">⏰ เวลาเริ่ม</label><input type="time" id="ef-start" value="09:00" class="inp"></div>
+          <div><label class="lbl">⏰ เวลาจบ</label><input type="time" id="ef-end" value="12:00" class="inp"></div>
+        </div>
+        <div><label class="lbl">🔒 ปิดรับจองวันที่ *</label><input type="datetime-local" id="ef-dl" class="inp"></div>
+        <div class="g2">
+          <div><label class="lbl">🏟 จำนวนคอร์ท</label>
+            <select id="ef-courts" class="inp"><option value="1">1 คอร์ท</option><option value="2" selected>2 คอร์ท</option><option value="3">3 คอร์ท</option></select>
+          </div>
+          <div><label class="lbl">💰 ค่าคอร์ท (฿)</label><input type="number" id="ef-fee" placeholder="เช่น 960" class="inp"></div>
+        </div>
+        <div class="g2">
+          <div><label class="lbl">🚶 Walk-in rate (฿)</label><input type="number" id="ef-wi" placeholder="150 หรือ 120" class="inp"></div>
+          <div><label class="lbl">📍 สถานที่</label><input type="text" id="ef-loc" placeholder="เช่น คอร์ทสุขุมวิท" class="inp"></div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-p" onclick="addEvent()">บันทึก</button>
+          <button class="btn btn-s" onclick="toggleEvForm()">ยกเลิก</button>
+        </div>
+      </div>
+    </div>
+    <div id="ev-list"></div>
+  </div>
+</div>
+
+<!-- ╔══════════════════════════════════════════════════════╗ -->
+<!-- ║  ADMIN COSTS                                         ║ -->
+<!-- ╚══════════════════════════════════════════════════════╝ -->
+<div id="page-adminCosts" class="page">
+  <div class="wrap">
+    <h2 style="font-size:20px;font-weight:800;margin-bottom:16px">💰 คิดค่าคอร์ท</h2>
+    <div class="card mb4">
+      <label class="lbl">เลือกวันเล่น</label>
+      <select id="cost-sel" class="inp" onchange="loadCost()"></select>
+    </div>
+    <div id="cost-content"></div>
+  </div>
+</div>
+
+<!-- ╔══════════════════════════════════════════════════════╗ -->
+<!-- ║  ADMIN MATCHES                                       ║ -->
+<!-- ╚══════════════════════════════════════════════════════╝ -->
+<div id="page-adminMatches" class="page">
+  <div class="wrap">
+    <h2 style="font-size:20px;font-weight:800;margin-bottom:16px">🎯 สุ่มคู่ผู้เล่น</h2>
+    <div class="card mb4">
+      <label class="lbl">เลือกวันเล่น</label>
+      <select id="match-sel" class="inp" onchange="loadMatch()"></select>
+    </div>
+    <div id="match-content"></div>
+  </div>
+</div>
+
+<!-- ╔══════════════════════════════════════════════════════╗ -->
+<!-- ║  ADMIN PLAYERS                                       ║ -->
+<!-- ╚══════════════════════════════════════════════════════╝ -->
+<div id="page-adminPlayers" class="page">
+  <div class="wrap">
+    <div class="row-b mb4">
+      <h2 style="font-size:20px;font-weight:800">👥 ผู้เล่น</h2>
+      <button class="btn btn-p btn-sm" onclick="toggleAdminAdd()">+ เพิ่ม</button>
+    </div>
+    <div id="ap-form" class="card hidden mb3">
+      <input id="ap-name" class="inp mb3" type="text" placeholder="ชื่อผู้เล่น" maxlength="20" onkeydown="if(event.key==='Enter')adminAddPlayer()">
+      <div class="btn-row">
+        <button class="btn btn-p" onclick="adminAddPlayer()">เพิ่ม</button>
+        <button class="btn btn-s" onclick="toggleAdminAdd()">ยกเลิก</button>
+      </div>
+    </div>
+    <div id="ap-list"></div>
+  </div>
+</div>
+
+<!-- ─── TOAST ─────────────────────────────────────────────── -->
+<div id="toast" class="hidden"></div>
+
+<script>
+// ════════════════════════════════════════════════════════════
+// MATCH SCHEDULE (ข้อมูลจริงจาก Google Sheets "โมเดลเล่นแบด")
+// Format: [[teamA_slot1, teamA_slot2], [teamB_slot1, teamB_slot2]]
+// sitting = all N players NOT in those 4 slots
+// ════════════════════════════════════════════════════════════
+const MS = {
+  5:  [[[1,5],[2,4]],[[1,2],[3,5]],[[2,5],[3,4]],[[1,4],[2,3]],[[1,3],[4,5]]],
+  6:  [[[1,6],[2,5]],[[1,2],[3,4]],[[3,5],[4,6]],[[1,2],[5,6]],[[1,3],[2,4]],[[3,4],[5,6]]],
+  7:  [[[1,5],[2,7]],[[3,4],[5,6]],[[1,2],[3,6]],[[1,7],[2,4]],[[3,5],[6,7]],[[1,3],[4,5]],[[2,6],[4,7]]],
+  8:  [[[2,5],[7,8]],[[1,3],[4,6]],[[2,8],[3,4]],[[1,6],[5,7]],[[1,7],[3,8]],[[2,4],[5,6]],[[1,8],[2,6]],[[3,7],[4,5]]],
+  9:  [[[1,5],[2,4]],[[3,7],[6,9]],[[3,8],[4,7]],[[1,2],[6,8]],[[1,6],[5,9]],[[3,9],[5,8]],[[2,7],[3,4]],[[2,5],[7,8]],[[1,9],[4,6]]],
+  10: [[[1,9],[2,10]],[[3,5],[6,7]],[[1,4],[8,9]],[[4,10],[5,6]],[[2,8],[3,7]],[[2,7],[4,6]],[[3,8],[5,10]],[[1,3],[4,9]],[[2,9],[5,8]],[[1,7],[6,10]]],
+  11: [[[3,10],[7,11]],[[1,6],[5,8]],[[1,9],[2,4]],[[6,8],[9,11]],[[3,7],[4,5]],[[2,3],[8,10]],[[4,7],[6,11]],[[1,5],[9,10]],[[1,2],[3,11]],[[2,10],[4,6]],[[5,7],[8,9]]],
+  12: [[[1,10],[3,7]],[[5,12],[9,11]],[[2,8],[4,6]],[[6,9],[10,11]],[[3,12],[5,7]],[[1,8],[2,4]],[[3,6],[9,12]],[[1,4],[5,10]],[[2,11],[7,8]],[[5,8],[7,10]],[[3,4],[6,11]],[[1,9],[2,12]]]
+};
+
+// ════════════════════════════════════════════════════════════
+// STATE & STORAGE
+// ════════════════════════════════════════════════════════════
+let S = { page:'landing', player:null, isAdmin:false, calDate:new Date(), curEv:null };
+
+const K = k => 'bhub_' + k;
+const load = (k, d=[]) => { try { return JSON.parse(localStorage.getItem(K(k))) ?? d; } catch { return d; } };
+const save = (k, v) => localStorage.setItem(K(k), JSON.stringify(v));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+
+const getPlayers  = () => load('players');
+const getEvents   = () => load('events');
+const getRegs     = () => load('regs');
+const getMatches  = () => load('matches', {});
+const getPin      = () => localStorage.getItem(K('pin')) || '1234';
+const savePlayers = v => save('players', v);
+const saveEvents  = v => save('events', v);
+const saveRegs    = v => save('regs', v);
+const saveMatches = v => save('matches', v);
+
+// ════════════════════════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════════════════════════
+function showPage(p) {
+  document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+  const el = document.getElementById('page-' + p);
+  if (el) el.classList.add('active');
+  S.page = p;
+  const noNav = ['landing','playerSelect','adminLogin'];
+  const nb = document.getElementById('navbar');
+  nb.classList.toggle('hidden', noNav.includes(p));
+  const nu = document.getElementById('nav-user');
+  nu.textContent = S.isAdmin ? '⚙️ Admin' : S.player ? '👤 ' + S.player.name : '';
+  window.scrollTo(0, 0);
+  if (p==='calendar')     renderCalendar();
+  if (p==='adminDash')    renderDash();
+  if (p==='adminEvents')  renderEvList();
+  if (p==='adminPlayers') renderApList();
+  if (p==='adminCosts')   initCost();
+  if (p==='adminMatches') initMatch();
+  if (p==='overview')     renderOverview();
+}
+function goHome() {
+  if (S.isAdmin) showPage('adminDash');
+  else if (S.player) showPage('calendar');
+  else showPage('landing');
+}
+function goToPlayerSelect() { S.isAdmin = false; renderPlayers(); showPage('playerSelect'); }
+function goToAdminLogin()   { document.getElementById('admin-pin').value=''; document.getElementById('pin-err').classList.add('hidden'); showPage('adminLogin'); }
+
+// ════════════════════════════════════════════════════════════
+// PLAYER SELECT
+// ════════════════════════════════════════════════════════════
+function renderPlayers() {
+  const players = getPlayers();
+  const el = document.getElementById('players-grid');
+  if (!players.length) { el.innerHTML='<div class="empty"><div class="empty-ico">👤</div><p class="empty-txt">ยังไม่มีผู้เล่น<br>กดเพิ่มชื่อด้านล่าง</p></div>'; return; }
+  el.innerHTML = players.map(p => `
+    <button class="pi" onclick="selPlayer('${p.id}')">
+      <div class="av">${firstChar(p.name)}</div>
+      <span class="pi-name">${p.name}</span>
+      <span class="pi-arr">›</span>
+    </button>`).join('');
+}
+function selPlayer(id) {
+  S.player = getPlayers().find(p => p.id === id);
+  showPage('calendar');
+}
+let addFormOpen = false;
+function toggleAddForm() {
+  addFormOpen = !addFormOpen;
+  document.getElementById('add-form').classList.toggle('hidden', !addFormOpen);
+  if (addFormOpen) setTimeout(() => document.getElementById('new-name').focus(), 50);
+}
+function addPlayer() {
+  const name = document.getElementById('new-name').value.trim(); if (!name) return;
+  const pl = getPlayers();
+  if (pl.some(p => p.name.toLowerCase() === name.toLowerCase())) { toast('ชื่อนี้มีอยู่แล้ว ⚠️'); return; }
+  pl.push({ id: uid(), name }); savePlayers(pl);
+  document.getElementById('new-name').value = '';
+  addFormOpen = false; document.getElementById('add-form').classList.add('hidden');
+  renderPlayers(); toast('เพิ่ม ' + name + ' เรียบร้อย ✓');
+}
+
+// ════════════════════════════════════════════════════════════
+// ADMIN AUTH
+// ════════════════════════════════════════════════════════════
+function adminLogin() {
+  if (document.getElementById('admin-pin').value === getPin()) {
+    S.isAdmin = true; S.player = null; showPage('adminDash');
+  } else {
+    document.getElementById('pin-err').classList.remove('hidden');
+    document.getElementById('admin-pin').classList.add('shake');
+    setTimeout(() => document.getElementById('admin-pin').classList.remove('shake'), 400);
+  }
+}
+function showChangePin()  { document.getElementById('pin-modal').classList.remove('hidden'); }
+function hideChangePin()  { document.getElementById('pin-modal').classList.add('hidden'); }
+function savePin() {
+  const p = document.getElementById('new-pin').value.trim();
+  if (p.length < 4) { toast('PIN ต้องมีอย่างน้อย 4 หลัก'); return; }
+  localStorage.setItem(K('pin'), p); hideChangePin(); toast('เปลี่ยน PIN แล้ว ✓');
+}
+function renderDash() {
+  const regs = getRegs();
+  document.getElementById('s-players').textContent = getPlayers().length;
+  document.getElementById('s-events').textContent  = getEvents().length;
+  document.getElementById('s-unpaid').textContent  = regs.filter(r => !r.paid).length;
+}
+
+// ════════════════════════════════════════════════════════════
+// CALENDAR
+// ════════════════════════════════════════════════════════════
+const TM = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+const TS = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+const TD = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัส','ศุกร์','เสาร์'];
+
+function renderCalendar() {
+  const d = S.calDate, y = d.getFullYear(), m = d.getMonth();
+  document.getElementById('cal-title').textContent = `${TM[m]} ${y+543}`;
+  const events = getEvents(), regs = getRegs(), pid = S.player?.id;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const firstDay = new Date(y,m,1).getDay();
+  const daysInMo = new Date(y,m+1,0).getDate();
+  let html = '<div></div>'.repeat(firstDay);
+  for (let day=1; day<=daysInMo; day++) {
+    const ds = `${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    const cd = new Date(y,m,day);
+    const ev = events.find(e => e.date === ds);
+    const isToday = cd.getTime() === today.getTime();
+    const isPast  = cd < today;
+    let cls='cc', dot='', oc='';
+    if (ev) {
+      const dl = new Date(ev.deadline), now = new Date();
+      const myR = pid && regs.find(r => r.eventId===ev.id && r.playerId===pid);
+      const cnt = regs.filter(r => r.eventId===ev.id).length;
+      if (myR) { cls+=' reg'; dot='<div class="cc-dot dot-a"></div>'; oc=`openEv('${ev.id}')`; }
+      else if (now<=dl) { cls+=' open'; dot='<div class="cc-dot dot-g"></div>'; oc=`openEv('${ev.id}')`; }
+      else { cls+=' wi'; dot='<div class="cc-dot dot-b"></div>'; oc=`openWI('${ev.id}')`; }
+    } else if (isPast) { cls+=' past'; }
+    if (isToday) cls+=' today';
+    html += `<div class="${cls}" ${oc?'onclick="'+oc+'"':''}>${day}${dot}</div>`;
+  }
+  document.getElementById('cal-cells').innerHTML = html;
+
+  const upcoming = events.filter(e=>new Date(e.date+'T23:59:59')>=today).sort((a,b)=>new Date(a.date)-new Date(b.date)).slice(0,6);
+  const cont = document.getElementById('upcoming');
+  if (!upcoming.length) { cont.innerHTML='<div class="empty-txt tc">ยังไม่มีวันเล่น</div>'; return; }
+  cont.innerHTML = upcoming.map(ev => {
+    const dl = new Date(ev.deadline), isOpen = new Date() <= dl;
+    const myR = S.player?.id && regs.find(r => r.eventId===ev.id && r.playerId===S.player.id);
+    const cnt = regs.filter(r => r.eventId===ev.id).length;
+    const sb = myR ? `<span class="badge ba">จองแล้ว ✓</span>` : isOpen ? `<span class="badge bg">เปิดจอง</span>` : `<span class="badge bb">Walk-in</span>`;
+    return `<div class="ev-card" onclick="${isOpen?"openEv('"+ev.id+"')":"openWI('"+ev.id+"')"}">
+      <div class="row-b">
+        <div>
+          <div class="fw7" style="font-size:15px">${formatDate(ev.date)}</div>
+          <div class="t-xs text-muted mt1">${ev.startTime||''} – ${ev.endTime||''} ${ev.location?'· '+ev.location:''}</div>
+          <div class="t-xs text-gray mt1">👥 ${cnt} คน · 🏟 ${ev.courts||1} คอร์ท</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+          ${sb}
+          ${isOpen?`<span class="t-xs text-muted">ปิด ${fmtDT(ev.deadline)}</span>`:''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function prevMonth() { S.calDate = new Date(S.calDate.getFullYear(), S.calDate.getMonth()-1, 1); renderCalendar(); }
+function nextMonth() { S.calDate = new Date(S.calDate.getFullYear(), S.calDate.getMonth()+1, 1); renderCalendar(); }
+
+// ════════════════════════════════════════════════════════════
+// EVENT DETAIL / REGISTER
+// ════════════════════════════════════════════════════════════
+function openEv(evId) {
+  S.curEv = evId;
+  const ev = getEvents().find(e=>e.id===evId);
+  const regs = getRegs(), pid = S.player?.id;
+  const allR = regs.filter(r=>r.eventId===evId);
+  const regR = allR.filter(r=>r.type!=='walkin');
+  const myR  = pid && allR.find(r=>r.playerId===pid);
+  const players = getPlayers();
+  const dl = new Date(ev.deadline), isOpen = new Date()<=dl;
+  document.getElementById('reg-content').innerHTML = `
+    <div class="hero hero-g" style="border-radius:28px;margin-bottom:16px">
+      <div style="font-size:32px;margin-bottom:8px">🏸</div>
+      <h2 style="font-size:24px;font-weight:900;margin-bottom:4px">${formatDate(ev.date)}</h2>
+      <p style="color:rgba(255,255,255,.7);font-size:13px">${ev.startTime||''} – ${ev.endTime||''}</p>
+      ${ev.location?`<p style="color:rgba(255,255,255,.6);font-size:12px;margin-top:4px">📍 ${ev.location}</p>`:''}
+    </div>
+    <div class="card mb3">
+      <div class="sum-row"><span class="sum-lbl">สถานะ</span><span class="fw7 ${isOpen?'text-g':'text-r'}">${isOpen?'🟢 เปิดรับจอง':'🔴 ปิดแล้ว'}</span></div>
+      <div class="sum-row"><span class="sum-lbl">ปิดรับจอง</span><span class="fw6">${fmtDT(ev.deadline)}</span></div>
+      <div class="sum-row"><span class="sum-lbl">คอร์ท</span><span class="fw6">${ev.courts||1} คอร์ท</span></div>
+      <div class="sum-row"><span class="sum-lbl">ผู้เล่น</span><span class="fw6">${regR.length} คน</span></div>
+    </div>
+    <div class="card-lg card-p0 mb3">
+      <div class="lh"><span class="fw7">รายชื่อผู้เล่น (${regR.length})</span></div>
+      ${regR.length ? regR.map((r,i)=>{
+        const p = players.find(pl=>pl.id===r.playerId);
+        return `<div class="lr">
+          <div class="av av-sm av-num">${i+1}</div>
+          <span class="fw6 f1">${p?.name||'?'}</span>
+          ${r.playerId===pid?'<span class="badge bg">คุณ</span>':''}
+        </div>`;}).join('')
+      : '<div class="empty-txt tc" style="padding:20px">ยังไม่มีผู้เล่น</div>'}
+    </div>
+    ${isOpen ? (!myR
+      ? `<button class="btn btn-p" onclick="doReg('${evId}')">✓ ลงทะเบียนเล่น</button>`
+      : `<div style="background:#ecfdf5;border:2px solid #a7f3d0;border-radius:18px;padding:16px;text-align:center;margin-bottom:8px">
+          <div style="font-size:28px;margin-bottom:4px">✅</div>
+          <div class="fw7 text-g">จองแล้ว!</div>
+         </div>
+         <button class="btn btn-d" onclick="cancelReg('${evId}')">ยกเลิกการจอง</button>`)
+      : `<div style="background:var(--gray-l);border-radius:16px;padding:16px;text-align:center;margin-bottom:8px;color:#94a3b8">⏰ ปิดรับจองแล้ว</div>
+         ${!myR?`<button class="btn btn-bl" onclick="openWI('${evId}')">🚶 Walk-in แทน</button>`:''}`}
+    ${myR && ev.courtFee?`<button class="btn btn-og mt2" onclick="openPay('${evId}')">💳 ไปหน้าชำระเงิน</button>`:''}
+  `;
+  showPage('register');
+}
+function doReg(evId) {
+  if (!S.player) { toast('กรุณาเลือกชื่อก่อน'); return; }
+  const ev = getEvents().find(e=>e.id===evId);
+  if (new Date() > new Date(ev.deadline)) { toast('ปิดรับจองแล้ว'); return; }
+  const regs = getRegs();
+  if (regs.some(r=>r.eventId===evId && r.playerId===S.player.id)) { toast('คุณจองแล้ว'); return; }
+  regs.push({id:uid(),eventId:evId,playerId:S.player.id,type:'regular',paid:false,slipUrl:null,slipAt:null,regAt:new Date().toISOString()});
+  saveRegs(regs); toast('ลงทะเบียนสำเร็จ! 🎉'); openEv(evId);
+}
+function cancelReg(evId) {
+  if (!confirm('ยืนยันการยกเลิก?')) return;
+  saveRegs(getRegs().filter(r=>!(r.eventId===evId&&r.playerId===S.player?.id)));
+  toast('ยกเลิกแล้ว'); openEv(evId);
+}
+
+// ════════════════════════════════════════════════════════════
+// WALK-IN
+// ════════════════════════════════════════════════════════════
+function openWI(evId) {
+  S.curEv = evId;
+  const ev = getEvents().find(e=>e.id===evId);
+  const regs = getRegs(), pid = S.player?.id;
+  const players = getPlayers();
+  const wiRegs = regs.filter(r=>r.eventId===evId&&r.type==='walkin');
+  const myWI   = pid && wiRegs.find(r=>r.playerId===pid);
+  document.getElementById('wi-content').innerHTML = `
+    <div class="hero hero-bl mb3">
+      <div class="fw7" style="font-size:15px">${formatDate(ev.date)}</div>
+      <div class="t-sm" style="color:rgba(255,255,255,.7);margin-top:4px">${ev.startTime||''} – ${ev.endTime||''}</div>
+      <div class="t-xs mt2" style="color:rgba(255,255,255,.6)">⚠️ ค่า Walk-in คงที่ ${ev.wiRate||120} ฿/คน</div>
+    </div>
+    ${!myWI
+      ? `<div class="card-lg mb3"><p class="t-sm text-gray mb3"><b>${S.player?.name||'คุณ'}</b> ต้องการลงเล่น Walk-in ใช่ไหม?</p>
+          <button class="btn btn-bl" onclick="doWI('${evId}')">✓ ยืนยัน Walk-in</button></div>`
+      : `<div style="background:#eff6ff;border:2px solid #bfdbfe;border-radius:18px;padding:16px;text-align:center;margin-bottom:12px">
+          <div style="font-size:28px;margin-bottom:4px">✅</div>
+          <div class="fw7 text-b">ลงทะเบียน Walk-in แล้ว!</div>
+         </div>
+         <button class="btn btn-og mb3" onclick="openPay('${evId}')">💳 ไปหน้าชำระเงิน</button>`}
+    <div class="card-lg card-p0">
+      <div class="lh"><span class="fw7">Walk-in วันนี้ (${wiRegs.length})</span></div>
+      ${wiRegs.length ? wiRegs.map((r,i)=>{const p=players.find(pl=>pl.id===r.playerId);return`<div class="lr"><div class="av av-sm av-bl">${firstChar(p?.name||'?')}</div><span class="fw6 f1">${p?.name||'?'}</span><span class="badge bb">Walk-in</span></div>`;}).join('')
+      : '<div class="empty-txt tc" style="padding:20px">ยังไม่มี Walk-in</div>'}
+    </div>`;
+  showPage('walkin');
+}
+function doWI(evId) {
+  if (!S.player) { toast('กรุณาเลือกชื่อก่อน'); return; }
+  const regs = getRegs();
+  if (regs.some(r=>r.eventId===evId&&r.playerId===S.player.id)) { toast('คุณลงทะเบียนไปแล้ว'); return; }
+  regs.push({id:uid(),eventId:evId,playerId:S.player.id,type:'walkin',paid:false,slipUrl:null,slipAt:null,regAt:new Date().toISOString()});
+  saveRegs(regs); toast('Walk-in สำเร็จ! 🎉'); openWI(evId);
+}
+
+// ════════════════════════════════════════════════════════════
+// PAYMENT  (ค่าคนละ = CEILING(ค่าคอร์ท / จำนวนผู้เล่น))
+// Walk-in จ่าย fixed rate (150 ศุกร์ / 120 วันอื่น)
+// ════════════════════════════════════════════════════════════
+function calcFees(ev, allRegs) {
+  if (!ev.courtFee) return null;
+  const wiRegs  = allRegs.filter(r=>r.type==='walkin');
+  const regRegs = allRegs.filter(r=>r.type!=='walkin');
+  const wiRate  = ev.wiRate || 120;
+  const wiTotal = wiRegs.length * wiRate;
+  const remain  = ev.courtFee - wiTotal;
+  const n       = regRegs.length;
+  const regFee  = n > 0 ? Math.ceil(remain / n) : 0;
+  return { regFee: Math.max(regFee, 0), wiRate, regCount: n, wiCount: wiRegs.length };
+}
+
+function openPay(evId) {
+  S.curEv = evId;
+  const ev = getEvents().find(e=>e.id===evId);
+  const allRegs = getRegs().filter(r=>r.eventId===evId);
+  const pid = S.player?.id;
+  const myR = pid && allRegs.find(r=>r.playerId===pid);
+  const fees = calcFees(ev, allRegs);
+  const myFee = myR?.type==='walkin' ? fees?.wiRate : fees?.regFee;
+
+  if (!fees) {
+    document.getElementById('pay-content').innerHTML = `
+      <div class="tc" style="padding:60px 20px">
+        <div style="font-size:64px;margin-bottom:16px">⏳</div>
+        <h3 style="font-size:20px;font-weight:800;margin-bottom:8px">กรุณารอสักครู่</h3>
+        <p class="text-muted t-sm">แอดมินกำลังประมวลผลยอดเงิน<br>หลังปิดรับจองจะได้รับยอดที่ต้องชำระ</p>
+      </div>`;
+  } else {
+    document.getElementById('pay-content').innerHTML = `
+      <div class="hero hero-g mb4" style="border-radius:28px">
+        <div class="fw7 t-lg mb1">ยอดชำระเงิน</div>
+        <p style="color:rgba(255,255,255,.65);font-size:13px;margin-bottom:16px">${formatDate(ev.date)}</p>
+        <div style="font-size:56px;font-weight:900;line-height:1">${(myFee||0).toLocaleString()}<span style="font-size:22px;font-weight:500"> ฿</span></div>
+        ${myR?.type==='walkin'?'<div style="color:rgba(255,255,255,.6);font-size:12px;margin-top:6px">อัตรา Walk-in</div>':''}
+      </div>
+      ${myR?.paid
+        ? `<div style="background:#ecfdf5;border:2px solid #a7f3d0;border-radius:20px;padding:20px;text-align:center;margin-bottom:16px">
+            <div style="font-size:36px;margin-bottom:8px">✅</div>
+            <div class="fw9 text-g t-lg">ชำระเงินแล้ว!</div>
+            ${myR.slipAt?`<div class="t-xs text-muted mt2">ส่งสลิปเมื่อ ${fmtDT(myR.slipAt)}</div>`:''}
+           </div>`
+        : `<div class="card-lg mb3">
+            <div class="fw7 mb3">📎 แนบสลิปการโอน</div>
+            <input type="file" id="slip-inp" accept="image/*" class="inp" style="padding:10px;font-size:13px;margin-bottom:12px">
+            <div id="slip-prev" class="hidden mb3"><img id="slip-img" class="slip-img" alt="slip"><button onclick="clearSlip()" style="background:rgba(0,0,0,.5);color:#fff;border:none;border-radius:999px;padding:4px 12px;font-size:12px;cursor:pointer">✕ ลบ</button></div>
+            <button class="btn btn-p" onclick="submitSlip('${myR?.id}')">📤 ส่งสลิป</button>
+          </div>`}
+      <div class="card">
+        <div class="fw7 mb3" style="font-size:14px">รายละเอียดการคำนวณ</div>
+        <div class="sum-row"><span class="sum-lbl">ค่าคอร์ทรวม (กรอกโดยแอดมิน)</span><span class="sum-val">${Number(ev.courtFee).toLocaleString()} ฿</span></div>
+        <div class="sum-row"><span class="sum-lbl">ผู้เล่นปกติ (${fees.regCount} คน)</span><span class="sum-val">${fees.regFee.toLocaleString()} ฿/คน</span></div>
+        ${fees.wiCount?`<div class="sum-row"><span class="sum-lbl">Walk-in (${fees.wiCount} คน) rate คงที่</span><span class="sum-val">${fees.wiRate} ฿/คน</span></div>`:''}
+        <div class="sum-row" style="border-top:2px solid var(--gray-b);margin-top:4px;padding-top:10px"><span class="sum-lbl">ค่าของคุณ</span><span class="sum-val g t-lg">${(myFee||0).toLocaleString()} ฿</span></div>
+      </div>`;
+    setTimeout(() => {
+      const inp = document.getElementById('slip-inp');
+      if (inp) inp.addEventListener('change', function() {
+        if (!this.files[0]) return;
+        const r = new FileReader(); r.onload = e => {
+          document.getElementById('slip-img').src = e.target.result;
+          document.getElementById('slip-prev').classList.remove('hidden');
+        }; r.readAsDataURL(this.files[0]);
+      });
+    }, 100);
+  }
+  showPage('payment');
+}
+function clearSlip() {
+  document.getElementById('slip-inp').value = '';
+  document.getElementById('slip-prev').classList.add('hidden');
+}
+function submitSlip(regId) {
+  const inp = document.getElementById('slip-inp');
+  if (!inp||!inp.files[0]) { toast('กรุณาเลือกรูปสลิปก่อน'); return; }
+  const r = new FileReader(); r.onload = e => {
+    const regs = getRegs(), reg = regs.find(r=>r.id===regId);
+    if (reg) { reg.slipUrl=e.target.result; reg.slipAt=new Date().toISOString(); saveRegs(regs); }
+    toast('ส่งสลิปแล้ว รอแอดมินตรวจสอบ ✓'); openPay(S.curEv);
+  }; r.readAsDataURL(inp.files[0]);
+}
+
+// ════════════════════════════════════════════════════════════
+// OVERVIEW
+// ════════════════════════════════════════════════════════════
+function renderOverview() {
+  const events = getEvents().sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const regs = getRegs(), players = getPlayers();
+  const cont = document.getElementById('ov-content');
+  if (!events.length) { cont.innerHTML='<div class="empty"><div class="empty-ico">📊</div><p class="empty-txt">ยังไม่มีข้อมูล</p></div>'; return; }
+  cont.innerHTML = events.map(ev => {
+    const evR = regs.filter(r=>r.eventId===ev.id);
+    return `<div class="card-lg card-p0 mb3">
+      <div class="lh" style="background:linear-gradient(135deg,var(--g1),var(--g2));padding:14px 16px">
+        <div><div class="fw7 text-w" style="font-size:14px">${formatDate(ev.date)}</div>
+          <div class="t-xs" style="color:rgba(255,255,255,.65);margin-top:2px">${ev.startTime||''} – ${ev.endTime||''} · ${ev.courts||1} คอร์ท</div>
+        </div>
+        <span class="badge" style="background:rgba(255,255,255,.25);color:#fff">${evR.length} คน</span>
+      </div>
+      ${evR.length ? evR.map((r,i)=>{
+        const p = players.find(pl=>pl.id===r.playerId);
+        return `<div class="lr">
+          <div class="av av-sm ${r.type==='walkin'?'av-bl':''}">${firstChar(p?.name||'?')}</div>
+          <span class="fw6 f1">${p?.name||'?'}</span>
+          ${r.type==='walkin'?'<span class="badge bb" style="margin-right:4px">Walk-in</span>':''}
+          ${r.paid?'<span class="badge bg">✓ จ่าย</span>':'<span class="badge bgr">รอจ่าย</span>'}
+        </div>`;}).join('')
+      : '<div class="empty-txt tc" style="padding:16px">ยังไม่มีผู้เล่น</div>'}
+    </div>`;}).join('');
+}
+
+// ════════════════════════════════════════════════════════════
+// ADMIN EVENTS
+// ════════════════════════════════════════════════════════════
+let evFormOpen = false;
+function toggleEvForm() {
+  evFormOpen = !evFormOpen;
+  document.getElementById('ev-form').classList.toggle('hidden', !evFormOpen);
+  if (evFormOpen) {
+    const t = new Date(); t.setDate(t.getDate()+1); t.setHours(20,0,0,0);
+    document.getElementById('ef-dl').value = t.toISOString().slice(0,16);
+  }
+}
+function addEvent() {
+  const date = document.getElementById('ef-date').value;
+  const dl   = document.getElementById('ef-dl').value;
+  if (!date||!dl) { toast('กรุณากรอกวันที่และปิดรับจอง'); return; }
+  // Auto walk-in rate based on day of week (Friday=5: 150, other: 120)
+  const dow = new Date(date+'T00:00:00').getDay();
+  const defaultWI = dow === 5 ? 150 : 120;
+  const events = getEvents();
+  events.push({
+    id:uid(), date, deadline:dl,
+    startTime: document.getElementById('ef-start').value,
+    endTime:   document.getElementById('ef-end').value,
+    courts:    document.getElementById('ef-courts').value,
+    courtFee:  document.getElementById('ef-fee').value ? Number(document.getElementById('ef-fee').value) : null,
+    wiRate:    document.getElementById('ef-wi').value ? Number(document.getElementById('ef-wi').value) : defaultWI,
+    location:  document.getElementById('ef-loc').value,
+  });
+  saveEvents(events); toggleEvForm(); renderEvList(); toast('เพิ่มวันเล่นแล้ว ✓');
+}
+function renderEvList() {
+  const events = getEvents().sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const regs = getRegs();
+  const cont = document.getElementById('ev-list');
+  if (!events.length) { cont.innerHTML='<div class="empty"><div class="empty-ico">📅</div><p class="empty-txt">ยังไม่มีวันเล่น</p></div>'; return; }
+  cont.innerHTML = events.map(ev => {
+    const cnt = regs.filter(r=>r.eventId===ev.id).length;
+    const isOpen = new Date() <= new Date(ev.deadline);
+    return `<div class="card mb3">
+      <div class="row-b mb3">
+        <div>
+          <div class="fw7" style="font-size:15px">${formatDate(ev.date)}</div>
+          <div class="t-xs text-muted mt1">${ev.startTime||''} – ${ev.endTime||''} ${ev.location?'· '+ev.location:''}</div>
+          <div class="t-xs text-gray mt1">👥 ${cnt} คน · 🏟 ${ev.courts||1} คอร์ท${ev.courtFee?' · 💰 '+Number(ev.courtFee).toLocaleString()+' ฿':''}</div>
+          <div class="t-xs text-muted mt1">🚶 Walk-in rate: ${ev.wiRate||120} ฿</div>
+        </div>
+        <span class="badge ${isOpen?'bg':'bgr'}">${isOpen?'เปิดจอง':'ปิดแล้ว'}</span>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-sm btn-og f1" onclick="editFee('${ev.id}')">💰 ใส่ค่าคอร์ท</button>
+        <button class="btn btn-sm btn-bl f1" onclick="viewEvAdmin('${ev.id}')">📊 คิดเงิน</button>
+        <button class="btn btn-sm btn-d" onclick="delEv('${ev.id}')">🗑</button>
+      </div>
+    </div>`;}).join('');
+}
+function editFee(evId) {
+  const f = prompt('กรอกค่าคอร์ทรวม (บาท):\n(ระบบจะปัดขึ้น CEILING ให้อัตโนมัติ)');
+  if (!f||isNaN(f)) return;
+  const events = getEvents(), ev = events.find(e=>e.id===evId);
+  ev.courtFee = Number(f); saveEvents(events); renderEvList(); toast('บันทึกค่าคอร์ทแล้ว ✓');
+}
+function delEv(evId) {
+  if (!confirm('ลบวันเล่นนี้?')) return;
+  saveEvents(getEvents().filter(e=>e.id!==evId));
+  saveRegs(getRegs().filter(r=>r.eventId!==evId));
+  renderEvList(); toast('ลบแล้ว');
+}
+function viewEvAdmin(evId) {
+  S.curEv = evId; showPage('adminCosts');
+  setTimeout(()=>{ document.getElementById('cost-sel').value=evId; loadCost(); }, 50);
+}
+
+// ════════════════════════════════════════════════════════════
+// ADMIN COSTS
+// ════════════════════════════════════════════════════════════
+function initCost() {
+  const events = getEvents().sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const sel = document.getElementById('cost-sel');
+  sel.innerHTML = events.map(e=>`<option value="${e.id}">${formatDate(e.date)}</option>`).join('');
+  if (S.curEv) sel.value = S.curEv;
+  if (events.length) loadCost();
+  else document.getElementById('cost-content').innerHTML='<div class="empty"><div class="empty-ico">💰</div><p class="empty-txt">ยังไม่มีวันเล่น</p></div>';
+}
+function loadCost() {
+  const evId = document.getElementById('cost-sel').value;
+  const ev = getEvents().find(e=>e.id===evId);
+  const allR = getRegs().filter(r=>r.eventId===evId);
+  const players = getPlayers();
+  const fees = calcFees(ev, allR);
+  const paidR   = allR.filter(r=>r.paid);
+  const unpaidR = allR.filter(r=>!r.paid);
+  const coll = fees ? paidR.reduce((s,r)=>s+(r.type==='walkin'?fees.wiRate:fees.regFee),0) : 0;
+  const pend = fees ? unpaidR.reduce((s,r)=>s+(r.type==='walkin'?fees.wiRate:fees.regFee),0) : 0;
+  document.getElementById('cost-content').innerHTML = `
+    <div class="card mb3">
+      <label class="lbl">ค่าคอร์ทรวม (฿) — ใส่ตามบิลจริง</label>
+      <div class="row">
+        <input type="number" id="fee-inp" value="${ev.courtFee||''}" placeholder="เช่น 960" class="inp f1">
+        <button class="btn btn-p btn-sm" onclick="saveFee('${evId}')">บันทึก</button>
+      </div>
+      ${fees?`<p class="t-xs text-muted mt2">💡 ค่าคนละ = CEILING(${Number(ev.courtFee).toLocaleString()} ÷ ผู้เล่น) ปัดขึ้นเสมอ</p>`:''}
+    </div>
+    ${fees ? `<div class="cost-grid">
+      <div class="cost-box cg"><div class="cost-n text-g">${fees.regFee.toLocaleString()}</div><div class="cost-l">฿/คน ปกติ (${fees.regCount} คน)</div></div>
+      <div class="cost-box cb"><div class="cost-n text-b">${fees.wiRate}</div><div class="cost-l">฿ Walk-in (${fees.wiCount} คน)</div></div>
+    </div>
+    <div class="cost-grid">
+      <div class="cost-box cg"><div class="cost-n text-g">${coll.toLocaleString()}</div><div class="cost-l">รับแล้ว ✅</div></div>
+      <div class="cost-box cr"><div class="cost-n text-r">${pend.toLocaleString()}</div><div class="cost-l">รอรับ ⏳</div></div>
+    </div>` : ''}
+    <div class="card-lg card-p0">
+      <div class="lh"><span class="fw7">รายการชำระเงิน</span><span class="t-sm text-muted">${paidR.length}/${allR.length} จ่ายแล้ว</span></div>
+      ${allR.length ? allR.map(r=>{
+        const p = players.find(pl=>pl.id===r.playerId);
+        const myFee = fees ? (r.type==='walkin'?fees.wiRate:fees.regFee) : '?';
+        return `<div class="lr">
+          <div class="av av-sm ${r.paid?'':'av-gray'}">${firstChar(p?.name||'?')}</div>
+          <div class="f1">
+            <div class="fw6 t-sm">${p?.name||'?'}</div>
+            <div class="t-xs ${r.type==='walkin'?'text-b':'text-muted'}">${r.type==='walkin'?'Walk-in':'ปกติ'} · ${typeof myFee==='number'?myFee.toLocaleString():myFee} ฿</div>
+          </div>
+          ${r.slipUrl?`<button class="btn btn-sm" style="background:#fef3c7;color:#92400e;font-size:12px;padding:6px 10px;border-radius:8px;border:none" onclick="viewSlip('${r.id}')">📷 สลิป</button>`:''}
+          <button onclick="togglePaid('${r.id}','${evId}')"
+            style="border:none;padding:8px 14px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;background:${r.paid?'#d1fae5':'#f1f5f9'};color:${r.paid?'#065f46':'#64748b'}">
+            ${r.paid ? '✓ จ่ายแล้ว' : 'ติ๊กจ่าย'}
+          </button>
+        </div>`;}).join('')
+      : '<div class="empty-txt tc" style="padding:24px">ยังไม่มีผู้เล่น</div>'}
+    </div>`;
+}
+function saveFee(evId) {
+  const f = Number(document.getElementById('fee-inp').value);
+  if (!f) { toast('กรุณากรอกค่าคอร์ท'); return; }
+  const events = getEvents(), ev = events.find(e=>e.id===evId);
+  ev.courtFee = f; saveEvents(events); loadCost(); toast('บันทึกแล้ว ✓');
+}
+function togglePaid(regId, evId) {
+  const regs = getRegs(), reg = regs.find(r=>r.id===regId);
+  if (reg) { reg.paid=!reg.paid; if(reg.paid) reg.paidAt=new Date().toISOString(); saveRegs(regs); loadCost(); toast(reg.paid?'✓ ติ๊กจ่ายแล้ว':'ยกเลิกสถานะ'); }
+}
+function viewSlip(regId) {
+  const reg = getRegs().find(r=>r.id===regId);
+  if (reg?.slipUrl) { const w=window.open('','_blank'); w.document.write(`<html><body style="margin:0;background:#000;display:flex;justify-content:center;align-items:center;min-height:100vh"><img src="${reg.slipUrl}" style="max-width:100%;max-height:100vh"></body></html>`); }
+}
+
+// ════════════════════════════════════════════════════════════
+// ADMIN MATCHES  (ข้อมูลจาก Google Sheets "โมเดลเล่นแบด")
+// ════════════════════════════════════════════════════════════
+function getSchedule(n) {
+  const key = Math.min(Math.max(n, 5), 12);
+  return MS[key] || MS[5];
+}
+function buildRound(schedule, roundIdx, n, shuffled) {
+  const s = schedule[roundIdx % schedule.length];
+  const t1 = s[0].map(slot => shuffled[slot-1]).filter(Boolean);
+  const t2 = s[1].map(slot => shuffled[slot-1]).filter(Boolean);
+  const all = shuffled.slice(0, n);
+  const playing = [...t1, ...t2];
+  const sit = all.filter(id => !playing.includes(id));
+  return { round: roundIdx+1, t1, t2, sit };
+}
+function initMatch() {
+  const events = getEvents().sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const sel = document.getElementById('match-sel');
+  sel.innerHTML = events.map(e=>`<option value="${e.id}">${formatDate(e.date)}</option>`).join('');
+  if (S.curEv) sel.value = S.curEv;
+  if (events.length) loadMatch();
+  else document.getElementById('match-content').innerHTML='<div class="empty"><div class="empty-ico">🎯</div><p class="empty-txt">ยังไม่มีวันเล่น</p></div>';
+}
+function loadMatch() {
+  const evId = document.getElementById('match-sel').value;
+  const regs = getRegs().filter(r=>r.eventId===evId);
+  const players = getPlayers();
+  const saved = getMatches()[evId];
+  const n = regs.length;
+  const gn = id => players.find(p=>p.id===id)?.name||'?';
+  document.getElementById('match-content').innerHTML = `
+    <div class="card mb3">
+      <div class="fw7 mb1">ผู้เล่นวันนี้: <span class="text-g">${n} คน</span></div>
+      <div class="t-sm text-muted">${regs.map(r=>{ const p=players.find(pl=>pl.id===r.playerId); return `<span style="display:inline-block;background:var(--gray-l);border-radius:8px;padding:2px 8px;margin:2px;font-size:12px">${p?.name||'?'}</span>`; }).join('')}</div>
+    </div>
+    ${n < 5
+      ? `<div class="empty"><div class="empty-ico">⚠️</div><p class="empty-txt">ต้องการผู้เล่นอย่างน้อย 5 คน<br>(ตอนนี้มี ${n} คน)</p></div>`
+      : `<button class="btn btn-p mb4" onclick="doRandomize('${evId}')">🎲 ${saved?'สุ่มใหม่':'สุ่มผู้เล่น'}</button>
+         ${saved ? renderMatchHTML(saved, gn) : '<div class="empty-txt tc">กดสุ่มเพื่อจับคู่</div>'}`}`;
+}
+function doRandomize(evId) {
+  const regs = getRegs().filter(r=>r.eventId===evId);
+  const n = regs.length; if(n<5){toast('ต้องการผู้เล่นอย่างน้อย 5 คน');return;}
+  const shuffled = [...regs.map(r=>r.playerId)].sort(()=>Math.random()-.5);
+  const sched = getSchedule(Math.min(n,12));
+  const rounds = sched.map((_, i) => buildRound(sched, i, n, shuffled));
+  const numAssign = shuffled.slice(0,n).map((id,i)=>({id,num:i+1}));
+  const m = getMatches(); m[evId] = {rounds, numAssign, at:new Date().toISOString()};
+  saveMatches(m); loadMatch(); toast('สุ่มแล้ว! 🎉');
+}
+function renderMatchHTML(saved, gn) {
+  return `
+    <div class="card-lg mb4">
+      <div class="fw7 mb3">🎲 หมายเลขที่จับได้</div>
+      <div class="num-grid">
+        ${saved.numAssign.map(({id,num})=>`
+          <div class="num-item">
+            <div class="av av-sm av-num">${num}</div>
+            <span class="fw7 t-sm">${gn(id)}</span>
+          </div>`).join('')}
+      </div>
+    </div>
+    <div class="fw7 mb3">📋 ตารางแมทซ์ (${saved.rounds.length} ตา)</div>
+    ${saved.rounds.map(r=>`
+      <div class="match-card">
+        <div class="match-hd"><span class="fw7 text-am">ตาที่ ${r.round}</span></div>
+        <div class="match-bd">
+          <div class="teams">
+            <div class="team tg">${r.t1.map(id=>`<div class="t-name green">${gn(id)}</div>`).join('')}</div>
+            <div class="vs">VS</div>
+            <div class="team tb">${r.t2.map(id=>`<div class="t-name blue">${gn(id)}</div>`).join('')}</div>
+          </div>
+          ${r.sit?.length?`<div class="sits">พัก: ${r.sit.map(gn).join(', ')}</div>`:''}
+        </div>
+      </div>`).join('')}`;
+}
+
+// ════════════════════════════════════════════════════════════
+// ADMIN PLAYERS
+// ════════════════════════════════════════════════════════════
+let apOpen = false;
+function toggleAdminAdd() {
+  apOpen = !apOpen;
+  document.getElementById('ap-form').classList.toggle('hidden', !apOpen);
+  if (apOpen) setTimeout(()=>document.getElementById('ap-name').focus(),50);
+}
+function adminAddPlayer() {
+  const name = document.getElementById('ap-name').value.trim(); if(!name) return;
+  const pl = getPlayers();
+  if (pl.some(p=>p.name.toLowerCase()===name.toLowerCase())) { toast('ชื่อนี้มีอยู่แล้ว'); return; }
+  pl.push({id:uid(),name}); savePlayers(pl);
+  document.getElementById('ap-name').value = '';
+  apOpen=false; document.getElementById('ap-form').classList.add('hidden');
+  renderApList(); toast('เพิ่ม '+name+' แล้ว ✓');
+}
+function renderApList() {
+  const players = getPlayers();
+  const cont = document.getElementById('ap-list');
+  if (!players.length) { cont.innerHTML='<div class="empty"><div class="empty-ico">👥</div><p class="empty-txt">ยังไม่มีผู้เล่น</p></div>'; return; }
+  cont.innerHTML = `<div class="card-lg card-p0">${players.map(p=>`
+    <div class="lr">
+      <div class="av">${firstChar(p.name)}</div>
+      <span class="fw7 f1">${p.name}</span>
+      <button onclick="delPlayer('${p.id}')" style="background:transparent;border:none;color:#94a3b8;font-size:13px;padding:6px 10px;border-radius:8px;cursor:pointer" onmouseover="this.style.background='#fef2f2';this.style.color='#ef4444'" onmouseout="this.style.background='transparent';this.style.color='#94a3b8'">ลบ</button>
+    </div>`).join('')}</div>`;
+}
+function delPlayer(id) {
+  if(!confirm('ลบผู้เล่นนี้?')) return;
+  savePlayers(getPlayers().filter(p=>p.id!==id)); renderApList(); toast('ลบแล้ว');
+}
+
+// ════════════════════════════════════════════════════════════
+// UTILITIES
+// ════════════════════════════════════════════════════════════
+function firstChar(name) {
+  // ตัดตัวอักษรพิเศษไทยที่นำหน้า แล้วเอาตัวแรก
+  const clean = name.replace(/^[เแโใไ]/u, match => match); // keep as-is
+  return name.charAt(0) || '?';
+}
+function formatDate(ds) {
+  const d = new Date(ds+'T00:00:00');
+  return `${TD[d.getDay()]}ที่ ${d.getDate()} ${TS[d.getMonth()]} ${d.getFullYear()+543}`;
+}
+function fmtDT(dt) {
+  const d = new Date(dt);
+  return `${d.getDate()} ${TS[d.getMonth()]} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')} น.`;
+}
+let tTimer;
+function toast(msg) {
+  const el = document.getElementById('toast'); el.textContent=msg; el.classList.remove('hidden');
+  clearTimeout(tTimer); tTimer = setTimeout(()=>el.classList.add('hidden'), 2800);
+}
+
+// ════════════════════════════════════════════════════════════
+// INIT — โหลดข้อมูลผู้เล่นตัวอย่าง (สมาชิกจริงของกลุ่ม)
+// ════════════════════════════════════════════════════════════
+(function init() {
+  if (!getPlayers().length) {
+    savePlayers([
+      {id:uid(),name:'ตั๊ก'},{id:uid(),name:'ก้อย'},{id:uid(),name:'ฟาง'},
+      {id:uid(),name:'ปุ๋ย'},{id:uid(),name:'เบียร์'},{id:uid(),name:'ดา'},
+      {id:uid(),name:'แนน'},{id:uid(),name:'เกมส์'},{id:uid(),name:'นัท'},
+      {id:uid(),name:'ทิว'},{id:uid(),name:'เบลล์'},{id:uid(),name:'ยุ้ย'},
+      {id:uid(),name:'ป๊อป'},{id:uid(),name:'โอห์ม'},{id:uid(),name:'เอิร์ธ'},
+    ]);
+  }
+  showPage('landing');
+})();
+</script>
+</body>
+</html>
