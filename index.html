@@ -242,14 +242,29 @@ input[type=file]::file-selector-button{background:var(--g2);color:#fff;border:no
 <body>
 
 <!-- ╔══════════════════════════════════════════════════════╗ -->
+<!-- ║  LOADING SCREEN (Firebase)                           ║ -->
+<!-- ╚══════════════════════════════════════════════════════╝ -->
+<div id="loading-screen" style="position:fixed;inset:0;background:linear-gradient(160deg,#064e3b 0%,#047857 60%,#059669 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;color:#fff;text-align:center;padding:24px">
+  <div style="font-size:80px;margin-bottom:20px;filter:drop-shadow(0 8px 20px rgba(0,0,0,.3))">🏸</div>
+  <div style="font-size:28px;font-weight:900;letter-spacing:-.5px;margin-bottom:8px">BadmintonHub</div>
+  <div style="color:rgba(255,255,255,.6);font-size:14px;margin-bottom:32px">กำลังเชื่อมต่อ...</div>
+  <div style="width:200px;height:5px;background:rgba(255,255,255,.2);border-radius:3px;overflow:hidden">
+    <div id="load-bar" style="width:0%;height:100%;background:#fff;border-radius:3px;transition:width .5s ease"></div>
+  </div>
+  <div id="load-status" style="color:rgba(255,255,255,.4);font-size:12px;margin-top:16px">กำลังโหลดข้อมูล...</div>
+</div>
+
+<!-- ╔══════════════════════════════════════════════════════╗ -->
 <!-- ║  NAVBAR                                              ║ -->
 <!-- ╚══════════════════════════════════════════════════════╝ -->
 <nav class="nb hidden" id="navbar">
   <div class="nb-in">
     <button class="nb-brand" onclick="goHome()"><span>🏸</span><span>BadmintonHub</span></button>
     <div class="row" style="gap:8px">
+      <span id="offline-badge" class="hidden" style="background:#ef4444;color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px">🔴 ออฟไลน์</span>
       <span class="nb-chip" id="nav-user"></span>
-      <button class="nb-home" onclick="goHome()">🏠</button>
+      <button class="nb-home" onclick="goHome()" title="หน้าหลัก">🏠</button>
+      <button class="nb-home" onclick="goToLanding()" title="เปลี่ยนผู้ใช้" style="font-size:15px">🚪</button>
     </div>
   </div>
 </nav>
@@ -274,7 +289,7 @@ input[type=file]::file-selector-button{background:var(--g2);color:#fff;border:no
         <span class="land-arr">›</span>
       </button>
     </div>
-    <p class="land-foot">v2.0 · สำหรับสมาชิก 10–20 คน</p>
+    <p class="land-foot">v3.0 · Firebase Sync · สำหรับสมาชิก 10–20 คน</p>
   </div>
 </div>
 
@@ -329,6 +344,7 @@ input[type=file]::file-selector-button{background:var(--g2);color:#fff;border:no
     </div>
     <p class="t-sm fw7 text-gray mb3" style="text-transform:uppercase;letter-spacing:.5px">วันเล่นที่กำลังจะมาถึง</p>
     <div id="upcoming"></div>
+    <button class="btn btn-am mt3" onclick="openMonthlyPayment()">💳 ชำระเงินประจำเดือน</button>
   </div>
 </div>
 
@@ -402,7 +418,7 @@ input[type=file]::file-selector-button{background:var(--g2);color:#fff;border:no
       <div class="stat-grid">
         <div class="stat-box"><div class="stat-n" id="s-players">0</div><div class="stat-l">ผู้เล่น</div></div>
         <div class="stat-box"><div class="stat-n" id="s-events">0</div><div class="stat-l">วันเล่น</div></div>
-        <div class="stat-box"><div class="stat-n" id="s-unpaid">0</div><div class="stat-l">ค้างชำระ</div></div>
+        <div class="stat-box"><div class="stat-n" id="s-unpaid">0</div><div class="stat-l">ยังไม่จ่าย</div></div>
       </div>
     </div>
     <div class="menu-grid">
@@ -411,6 +427,7 @@ input[type=file]::file-selector-button{background:var(--g2);color:#fff;border:no
       <button class="mc" onclick="showPage('adminMatches')"><span class="mc-icon">🎯</span><div class="mc-title">สุ่มคู่</div><div class="mc-sub">จับคู่ผู้เล่น</div></button>
       <button class="mc" onclick="showPage('adminPlayers')"><span class="mc-icon">👥</span><div class="mc-title">ผู้เล่น</div><div class="mc-sub">จัดการรายชื่อ</div></button>
       <button class="mc mc-full" onclick="showPage('overview')"><span style="font-size:32px">📊</span><div><div class="mc-title">ภาพรวมผู้เล่น</div><div class="mc-sub">ดูตารางทุกวัน</div></div></button>
+      <button class="mc mc-full" onclick="openAdminMonthlyPay()"><span style="font-size:32px">💳</span><div><div class="mc-title">ชำระเงินประจำเดือน</div><div class="mc-sub">ยืนยันสลิปสมาชิก</div></div></button>
       <button class="mc mc-full" onclick="showChangePin()" style="padding:14px 20px"><span style="font-size:24px">🔑</span><div class="mc-title" style="font-size:14px">เปลี่ยน PIN แอดมิน</div></button>
     </div>
   </div>
@@ -512,14 +529,63 @@ input[type=file]::file-selector-button{background:var(--g2);color:#fff;border:no
   </div>
 </div>
 
+<!-- ╔══════════════════════════════════════════════════════╗ -->
+<!-- ║  ADMIN EVENT DETAIL (จัดการผู้เล่นต่อ event)         ║ -->
+<!-- ╚══════════════════════════════════════════════════════╝ -->
+<div id="page-adminEventDetail" class="page">
+  <div class="wrap">
+    <div class="row mb4" style="gap:10px">
+      <button class="btn btn-s btn-sm" onclick="showPage('adminEvents')" style="width:auto;flex-shrink:0">← กลับ</button>
+      <h2 style="font-size:18px;font-weight:800">👥 จัดการผู้เล่น</h2>
+    </div>
+    <div id="aed-content"></div>
+  </div>
+</div>
+
+<!-- ╔══════════════════════════════════════════════════════╗ -->
+<!-- ║  MONTHLY PAYMENT (ชำระเงินประจำเดือน — ผู้เล่น)    ║ -->
+<!-- ╚══════════════════════════════════════════════════════╝ -->
+<div id="page-monthlyPayment" class="page">
+  <div class="wrap slide-up" id="mp-content"></div>
+</div>
+
+<!-- ╔══════════════════════════════════════════════════════╗ -->
+<!-- ║  ADMIN MONTHLY PAY (ยืนยันการชำระเงินรายเดือน)     ║ -->
+<!-- ╚══════════════════════════════════════════════════════╝ -->
+<div id="page-adminMonthlyPay" class="page">
+  <div class="wrap">
+    <div id="amp-content"></div>
+  </div>
+</div>
+
+<!-- ─── PIN CONFIRM MODAL (reusable) ──────────────────────── -->
+<div class="modal hidden" id="pin-confirm-modal">
+  <div class="modal-box">
+    <h3 class="fw7 mb2">🔐 ยืนยัน PIN แอดมิน</h3>
+    <p class="t-sm text-muted mb3" id="pcm-msg"></p>
+    <input id="pcm-pin" class="inp inp-center mb2" type="password" placeholder="• • • •" maxlength="6"
+      onkeydown="if(event.key==='Enter')doConfirmPin()">
+    <p id="pcm-err" class="t-sm text-r tc mb3 hidden">PIN ไม่ถูกต้อง</p>
+    <div class="btn-row">
+      <button class="btn btn-p" onclick="doConfirmPin()">ยืนยัน</button>
+      <button class="btn btn-s" onclick="cancelConfirmPin()">ยกเลิก</button>
+    </div>
+  </div>
+</div>
+
 <!-- ─── TOAST ─────────────────────────────────────────────── -->
 <div id="toast" class="hidden"></div>
+
+<!-- ╔══════════════════════════════════════════════════════╗ -->
+<!-- ║  FIREBASE SDK                                        ║ -->
+<!-- ╚══════════════════════════════════════════════════════╝ -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <script>
 // ════════════════════════════════════════════════════════════
 // MATCH SCHEDULE (ข้อมูลจริงจาก Google Sheets "โมเดลเล่นแบด")
-// Format: [[teamA_slot1, teamA_slot2], [teamB_slot1, teamB_slot2]]
-// sitting = all N players NOT in those 4 slots
 // ════════════════════════════════════════════════════════════
 const MS = {
   5:  [[[1,5],[2,4]],[[1,2],[3,5]],[[2,5],[3,4]],[[1,4],[2,3]],[[1,3],[4,5]]],
@@ -533,24 +599,139 @@ const MS = {
 };
 
 // ════════════════════════════════════════════════════════════
-// STATE & STORAGE
+// FIREBASE INIT
 // ════════════════════════════════════════════════════════════
-let S = { page:'landing', player:null, isAdmin:false, calDate:new Date(), curEv:null };
+firebase.initializeApp({
+  apiKey:            "AIzaSyAscxlSVMXL-wom8wcCOTRDRCAWbCtEbz0",
+  authDomain:        "badminton-hub-6cdff.firebaseapp.com",
+  databaseURL:       "https://badminton-hub-6cdff-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:         "badminton-hub-6cdff",
+  storageBucket:     "badminton-hub-6cdff.firebasestorage.app",
+  messagingSenderId: "609038389943",
+  appId:             "1:609038389943:web:f04430b0e3df48bed17332"
+});
+const DB   = firebase.database();
+const fRef = path => DB.ref(path);
 
-const K = k => 'bhub_' + k;
-const load = (k, d=[]) => { try { return JSON.parse(localStorage.getItem(K(k))) ?? d; } catch { return d; } };
-const save = (k, v) => localStorage.setItem(K(k), JSON.stringify(v));
-const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+// ════════════════════════════════════════════════════════════
+// LOCAL CACHE (reads sync from memory, writes go to Firebase)
+// ════════════════════════════════════════════════════════════
+let CACHE = { players:[], events:[], regs:[], matches:{}, pin:'1234', monthlyPay:{} };
+const o2a = obj => obj ? Object.values(obj) : [];
+const uid  = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
 
-const getPlayers  = () => load('players');
-const getEvents   = () => load('events');
-const getRegs     = () => load('regs');
-const getMatches  = () => load('matches', {});
-const getPin      = () => localStorage.getItem(K('pin')) || '1234';
-const savePlayers = v => save('players', v);
-const saveEvents  = v => save('events', v);
-const saveRegs    = v => save('regs', v);
-const saveMatches = v => save('matches', v);
+// ── Getters (synchronous, from cache) ──────────────────────
+const getPlayers = () => CACHE.players;
+const getEvents  = () => CACHE.events;
+const getRegs    = () => CACHE.regs;
+const getMatches = () => CACHE.matches;
+const getPin     = () => CACHE.pin;
+
+// ── Savers (update cache + write to Firebase) ──────────────
+function savePlayers(v) {
+  CACHE.players = v;
+  const obj = {}; v.forEach(p => { obj[p.id] = p; });
+  fRef('/players').set(obj);
+}
+function saveEvents(v) {
+  CACHE.events = v;
+  const obj = {}; v.forEach(e => { obj[e.id] = e; });
+  fRef('/events').set(obj);
+}
+function saveRegs(v) {
+  CACHE.regs = v;
+  const obj = {}; v.forEach(r => { obj[r.id] = r; });
+  fRef('/regs').set(obj);
+}
+function saveMatches(v) {
+  CACHE.matches = v;
+  fRef('/matches').set(v);
+}
+
+// ════════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════════
+let S = { page:'loading', player:null, isAdmin:false, calDate:new Date(), curEv:null };
+
+// ════════════════════════════════════════════════════════════
+// REAL-TIME LISTENERS + INITIAL LOAD
+// ════════════════════════════════════════════════════════════
+const _ready = new Set();
+function _onReady(key) {
+  _ready.add(key);
+  const pct = Math.round((_ready.size / 6) * 100);
+  const bar = document.getElementById('load-bar');
+  if (bar) bar.style.width = pct + '%';
+  if (_ready.size >= 6) {
+    setTimeout(() => {
+      document.getElementById('loading-screen').style.display = 'none';
+    }, 400);
+    if (!CACHE.players.length) {
+      savePlayers([
+        {id:uid(),name:'ตั๊ก'},{id:uid(),name:'ก้อย'},{id:uid(),name:'ฟาง'},
+        {id:uid(),name:'ปุ๋ย'},{id:uid(),name:'เบียร์'},{id:uid(),name:'ดา'},
+        {id:uid(),name:'แนน'},{id:uid(),name:'เกมส์'},{id:uid(),name:'นัท'},
+        {id:uid(),name:'ทิว'},{id:uid(),name:'เบลล์'},{id:uid(),name:'ยุ้ย'},
+        {id:uid(),name:'ป๊อป'},{id:uid(),name:'โอห์ม'},{id:uid(),name:'เอิร์ธ'},
+      ]);
+    }
+    showPage('landing');
+  }
+}
+
+function refreshCurrentPage() {
+  const p = S.page;
+  if      (p==='calendar')     renderCalendar();
+  else if (p==='adminDash')    renderDash();
+  else if (p==='adminEvents')  renderEvList();
+  else if (p==='adminPlayers') renderApList();
+  else if (p==='adminCosts')   initCost();
+  else if (p==='adminMatches') initMatch();
+  else if (p==='overview')     renderOverview();
+  else if (p==='register'        && S.curEv) openEv(S.curEv);
+  else if (p==='walkin'          && S.curEv) openWI(S.curEv);
+  else if (p==='payment'         && S.curEv) openPay(S.curEv);
+  else if (p==='adminEventDetail'&& S.curEv) renderAdminEventDetail();
+  else if (p==='monthlyPayment')             renderMonthlyPayment();
+  else if (p==='adminMonthlyPay')            renderAdminMonthlyPay();
+}
+
+(function setupListeners() {
+  fRef('/players').on('value', snap => {
+    CACHE.players = o2a(snap.val());
+    if (!_ready.has('players')) { _onReady('players'); return; }
+    refreshCurrentPage();
+  });
+  fRef('/events').on('value', snap => {
+    CACHE.events = o2a(snap.val());
+    if (!_ready.has('events')) { _onReady('events'); return; }
+    refreshCurrentPage();
+  });
+  fRef('/regs').on('value', snap => {
+    CACHE.regs = o2a(snap.val());
+    if (!_ready.has('regs')) { _onReady('regs'); return; }
+    refreshCurrentPage();
+  });
+  fRef('/matches').on('value', snap => {
+    CACHE.matches = snap.val() || {};
+    if (!_ready.has('matches')) { _onReady('matches'); return; }
+    refreshCurrentPage();
+  });
+  fRef('/config/pin').on('value', snap => {
+    CACHE.pin = snap.val() || '1234';
+    _onReady('pin');
+  });
+  fRef('/monthlyPay').on('value', snap => {
+    CACHE.monthlyPay = snap.val() || {};
+    if (!_ready.has('monthlyPay')) { _onReady('monthlyPay'); return; }
+    refreshCurrentPage();
+  });
+  // Connection status indicator
+  fRef('.info/connected').on('value', snap => {
+    const badge = document.getElementById('offline-badge');
+    if (badge) badge.classList.toggle('hidden', snap.val() === true);
+  });
+})();
 
 // ════════════════════════════════════════════════════════════
 // NAVIGATION
@@ -566,13 +747,16 @@ function showPage(p) {
   const nu = document.getElementById('nav-user');
   nu.textContent = S.isAdmin ? '⚙️ Admin' : S.player ? '👤 ' + S.player.name : '';
   window.scrollTo(0, 0);
-  if (p==='calendar')     renderCalendar();
-  if (p==='adminDash')    renderDash();
-  if (p==='adminEvents')  renderEvList();
-  if (p==='adminPlayers') renderApList();
-  if (p==='adminCosts')   initCost();
-  if (p==='adminMatches') initMatch();
-  if (p==='overview')     renderOverview();
+  if (p==='calendar')          renderCalendar();
+  if (p==='adminDash')         renderDash();
+  if (p==='adminEvents')       renderEvList();
+  if (p==='adminPlayers')      renderApList();
+  if (p==='adminCosts')        initCost();
+  if (p==='adminMatches')      initMatch();
+  if (p==='overview')          renderOverview();
+  if (p==='adminEventDetail')  renderAdminEventDetail();
+  if (p==='monthlyPayment')    renderMonthlyPayment();
+  if (p==='adminMonthlyPay')   renderAdminMonthlyPay();
 }
 function goHome() {
   if (S.isAdmin) showPage('adminDash');
@@ -581,6 +765,7 @@ function goHome() {
 }
 function goToPlayerSelect() { S.isAdmin = false; renderPlayers(); showPage('playerSelect'); }
 function goToAdminLogin()   { document.getElementById('admin-pin').value=''; document.getElementById('pin-err').classList.add('hidden'); showPage('adminLogin'); }
+function goToLanding()      { S.player = null; S.isAdmin = false; S.curEv = null; showPage('landing'); }
 
 // ════════════════════════════════════════════════════════════
 // PLAYER SELECT
@@ -633,13 +818,18 @@ function hideChangePin()  { document.getElementById('pin-modal').classList.add('
 function savePin() {
   const p = document.getElementById('new-pin').value.trim();
   if (p.length < 4) { toast('PIN ต้องมีอย่างน้อย 4 หลัก'); return; }
-  localStorage.setItem(K('pin'), p); hideChangePin(); toast('เปลี่ยน PIN แล้ว ✓');
+  CACHE.pin = p;
+  fRef('/config/pin').set(p);
+  hideChangePin(); toast('เปลี่ยน PIN แล้ว ✓');
 }
 function renderDash() {
-  const regs = getRegs();
-  document.getElementById('s-players').textContent = getPlayers().length;
+  const players = getPlayers();
+  const mp = getMonthlyPay();
+  const mk = getMonthKey();
+  const paidCount = players.filter(p => mp[p.id]?.[mk]?.paid).length;
+  document.getElementById('s-players').textContent = players.length;
   document.getElementById('s-events').textContent  = getEvents().length;
-  document.getElementById('s-unpaid').textContent  = regs.filter(r => !r.paid).length;
+  document.getElementById('s-unpaid').textContent  = players.length - paidCount;
 }
 
 // ════════════════════════════════════════════════════════════
@@ -667,7 +857,6 @@ function renderCalendar() {
     if (ev) {
       const dl = new Date(ev.deadline), now = new Date();
       const myR = pid && regs.find(r => r.eventId===ev.id && r.playerId===pid);
-      const cnt = regs.filter(r => r.eventId===ev.id).length;
       if (myR) { cls+=' reg'; dot='<div class="cc-dot dot-a"></div>'; oc=`openEv('${ev.id}')`; }
       else if (now<=dl) { cls+=' open'; dot='<div class="cc-dot dot-g"></div>'; oc=`openEv('${ev.id}')`; }
       else { cls+=' wi'; dot='<div class="cc-dot dot-b"></div>'; oc=`openWI('${ev.id}')`; }
@@ -748,7 +937,7 @@ function openEv(evId) {
          <button class="btn btn-d" onclick="cancelReg('${evId}')">ยกเลิกการจอง</button>`)
       : `<div style="background:var(--gray-l);border-radius:16px;padding:16px;text-align:center;margin-bottom:8px;color:#94a3b8">⏰ ปิดรับจองแล้ว</div>
          ${!myR?`<button class="btn btn-bl" onclick="openWI('${evId}')">🚶 Walk-in แทน</button>`:''}`}
-    ${myR && ev.courtFee?`<button class="btn btn-og mt2" onclick="openPay('${evId}')">💳 ไปหน้าชำระเงิน</button>`:''}
+    <button class="btn btn-og mt2" onclick="openMonthlyPayment()">💳 ชำระเงินประจำเดือน</button>
   `;
   showPage('register');
 }
@@ -790,7 +979,7 @@ function openWI(evId) {
           <div style="font-size:28px;margin-bottom:4px">✅</div>
           <div class="fw7 text-b">ลงทะเบียน Walk-in แล้ว!</div>
          </div>
-         <button class="btn btn-og mb3" onclick="openPay('${evId}')">💳 ไปหน้าชำระเงิน</button>`}
+         <button class="btn btn-og mb3" onclick="openMonthlyPayment()">💳 ชำระเงินประจำเดือน</button>`}
     <div class="card-lg card-p0">
       <div class="lh"><span class="fw7">Walk-in วันนี้ (${wiRegs.length})</span></div>
       ${wiRegs.length ? wiRegs.map((r,i)=>{const p=players.find(pl=>pl.id===r.playerId);return`<div class="lr"><div class="av av-sm av-bl">${firstChar(p?.name||'?')}</div><span class="fw6 f1">${p?.name||'?'}</span><span class="badge bb">Walk-in</span></div>`;}).join('')
@@ -807,8 +996,7 @@ function doWI(evId) {
 }
 
 // ════════════════════════════════════════════════════════════
-// PAYMENT  (ค่าคนละ = CEILING(ค่าคอร์ท / จำนวนผู้เล่น))
-// Walk-in จ่าย fixed rate (150 ศุกร์ / 120 วันอื่น)
+// PAYMENT
 // ════════════════════════════════════════════════════════════
 function calcFees(ev, allRegs) {
   if (!ev.courtFee) return null;
@@ -820,6 +1008,37 @@ function calcFees(ev, allRegs) {
   const n       = regRegs.length;
   const regFee  = n > 0 ? Math.ceil(remain / n) : 0;
   return { regFee: Math.max(regFee, 0), wiRate, regCount: n, wiCount: wiRegs.length };
+}
+
+// ── Image compression (ลดขนาดก่อนอัปโหลด Firebase) ─────────
+function compressImage(file) {
+  return new Promise(resolve => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let w = img.width, h = img.height;
+        const maxDim = 1200;
+        if (w > maxDim || h > maxDim) {
+          if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
+          else       { w = Math.round(w * maxDim / h); h = maxDim; }
+        }
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        let quality = 0.75;
+        let data = canvas.toDataURL('image/jpeg', quality);
+        // Target < 350KB base64
+        while (data.length > 350 * 1024 * 1.37 && quality > 0.2) {
+          quality -= 0.1;
+          data = canvas.toDataURL('image/jpeg', quality);
+        }
+        resolve(data);
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
 }
 
 function openPay(evId) {
@@ -854,13 +1073,13 @@ function openPay(evId) {
            </div>`
         : `<div class="card-lg mb3">
             <div class="fw7 mb3">📎 แนบสลิปการโอน</div>
-            <input type="file" id="slip-inp" accept="image/*" class="inp" style="padding:10px;font-size:13px;margin-bottom:12px">
+            <input type="file" id="slip-inp" accept="image/*" capture="environment" class="inp" style="padding:10px;font-size:13px;margin-bottom:12px">
             <div id="slip-prev" class="hidden mb3"><img id="slip-img" class="slip-img" alt="slip"><button onclick="clearSlip()" style="background:rgba(0,0,0,.5);color:#fff;border:none;border-radius:999px;padding:4px 12px;font-size:12px;cursor:pointer">✕ ลบ</button></div>
             <button class="btn btn-p" onclick="submitSlip('${myR?.id}')">📤 ส่งสลิป</button>
           </div>`}
       <div class="card">
         <div class="fw7 mb3" style="font-size:14px">รายละเอียดการคำนวณ</div>
-        <div class="sum-row"><span class="sum-lbl">ค่าคอร์ทรวม (กรอกโดยแอดมิน)</span><span class="sum-val">${Number(ev.courtFee).toLocaleString()} ฿</span></div>
+        <div class="sum-row"><span class="sum-lbl">ค่าคอร์ทรวม</span><span class="sum-val">${Number(ev.courtFee).toLocaleString()} ฿</span></div>
         <div class="sum-row"><span class="sum-lbl">ผู้เล่นปกติ (${fees.regCount} คน)</span><span class="sum-val">${fees.regFee.toLocaleString()} ฿/คน</span></div>
         ${fees.wiCount?`<div class="sum-row"><span class="sum-lbl">Walk-in (${fees.wiCount} คน) rate คงที่</span><span class="sum-val">${fees.wiRate} ฿/คน</span></div>`:''}
         <div class="sum-row" style="border-top:2px solid var(--gray-b);margin-top:4px;padding-top:10px"><span class="sum-lbl">ค่าของคุณ</span><span class="sum-val g t-lg">${(myFee||0).toLocaleString()} ฿</span></div>
@@ -882,14 +1101,21 @@ function clearSlip() {
   document.getElementById('slip-inp').value = '';
   document.getElementById('slip-prev').classList.add('hidden');
 }
-function submitSlip(regId) {
+async function submitSlip(regId) {
   const inp = document.getElementById('slip-inp');
-  if (!inp||!inp.files[0]) { toast('กรุณาเลือกรูปสลิปก่อน'); return; }
-  const r = new FileReader(); r.onload = e => {
-    const regs = getRegs(), reg = regs.find(r=>r.id===regId);
-    if (reg) { reg.slipUrl=e.target.result; reg.slipAt=new Date().toISOString(); saveRegs(regs); }
-    toast('ส่งสลิปแล้ว รอแอดมินตรวจสอบ ✓'); openPay(S.curEv);
-  }; r.readAsDataURL(inp.files[0]);
+  if (!inp || !inp.files[0]) { toast('กรุณาเลือกรูปสลิปก่อน'); return; }
+  toast('⏳ กำลังอัปโหลดสลิป...');
+  try {
+    const compressed = await compressImage(inp.files[0]);
+    const regs = getRegs();
+    const reg  = regs.find(r => r.id === regId);
+    if (reg) { reg.slipUrl = compressed; reg.slipAt = new Date().toISOString(); saveRegs(regs); }
+    toast('ส่งสลิปแล้ว รอแอดมินตรวจสอบ ✓');
+    openPay(S.curEv);
+  } catch(err) {
+    console.error(err);
+    toast('อัปโหลดไม่สำเร็จ ลองใหม่');
+  }
 }
 
 // ════════════════════════════════════════════════════════════
@@ -937,7 +1163,6 @@ function addEvent() {
   const date = document.getElementById('ef-date').value;
   const dl   = document.getElementById('ef-dl').value;
   if (!date||!dl) { toast('กรุณากรอกวันที่และปิดรับจอง'); return; }
-  // Auto walk-in rate based on day of week (Friday=5: 150, other: 120)
   const dow = new Date(date+'T00:00:00').getDay();
   const defaultWI = dow === 5 ? 150 : 120;
   const events = getEvents();
@@ -970,10 +1195,15 @@ function renderEvList() {
         </div>
         <span class="badge ${isOpen?'bg':'bgr'}">${isOpen?'เปิดจอง':'ปิดแล้ว'}</span>
       </div>
-      <div class="btn-row">
-        <button class="btn btn-sm btn-og f1" onclick="editFee('${ev.id}')">💰 ใส่ค่าคอร์ท</button>
-        <button class="btn btn-sm btn-bl f1" onclick="viewEvAdmin('${ev.id}')">📊 คิดเงิน</button>
-        <button class="btn btn-sm btn-d" onclick="delEv('${ev.id}')">🗑</button>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div class="btn-row">
+          <button class="btn btn-sm btn-p f1" onclick="openAdminEventDetail('${ev.id}')">👥 จัดการผู้เล่น</button>
+          <button class="btn btn-sm btn-bl f1" onclick="viewEvAdmin('${ev.id}')">📊 คิดเงิน</button>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-sm btn-og f1" onclick="editFee('${ev.id}')">💰 ค่าคอร์ท</button>
+          <button class="btn btn-sm btn-d" style="width:auto;padding:9px 16px" onclick="delEv('${ev.id}')">🗑</button>
+        </div>
       </div>
     </div>`;}).join('');
 }
@@ -1068,7 +1298,7 @@ function viewSlip(regId) {
 }
 
 // ════════════════════════════════════════════════════════════
-// ADMIN MATCHES  (ข้อมูลจาก Google Sheets "โมเดลเล่นแบด")
+// ADMIN MATCHES
 // ════════════════════════════════════════════════════════════
 function getSchedule(n) {
   const key = Math.min(Math.max(n, 5), 12);
@@ -1106,17 +1336,23 @@ function loadMatch() {
     ${n < 5
       ? `<div class="empty"><div class="empty-ico">⚠️</div><p class="empty-txt">ต้องการผู้เล่นอย่างน้อย 5 คน<br>(ตอนนี้มี ${n} คน)</p></div>`
       : `<button class="btn btn-p mb4" onclick="doRandomize('${evId}')">🎲 ${saved?'สุ่มใหม่':'สุ่มผู้เล่น'}</button>
-         ${saved ? renderMatchHTML(saved, gn) : '<div class="empty-txt tc">กดสุ่มเพื่อจับคู่</div>'}`}`;
+         ${saved
+           ? `<div class="btn-row mb3">
+                <button class="btn btn-sm btn-bl f1" onclick="exportMatchPDF('${evId}')">📄 Export PDF</button>
+                <button class="btn btn-sm btn-og f1" onclick="exportMatchExcel('${evId}')">📊 Export Excel</button>
+              </div>${renderMatchHTML(saved, gn)}`
+           : '<div class="empty-txt tc">กดสุ่มเพื่อจับคู่</div>'}`}`;
 }
 function doRandomize(evId) {
   const regs = getRegs().filter(r=>r.eventId===evId);
   const n = regs.length; if(n<5){toast('ต้องการผู้เล่นอย่างน้อย 5 คน');return;}
   const shuffled = [...regs.map(r=>r.playerId)].sort(()=>Math.random()-.5);
   const sched = getSchedule(Math.min(n,12));
-  const rounds = sched.map((_, i) => buildRound(sched, i, n, shuffled));
+  const rounds = [];
+  for (let i = 0; i < 30; i++) rounds.push(buildRound(sched, i, n, shuffled));
   const numAssign = shuffled.slice(0,n).map((id,i)=>({id,num:i+1}));
   const m = getMatches(); m[evId] = {rounds, numAssign, at:new Date().toISOString()};
-  saveMatches(m); loadMatch(); toast('สุ่มแล้ว! 🎉');
+  saveMatches(m); loadMatch(); toast('สุ่ม 30 ตาแล้ว! 🎉');
 }
 function renderMatchHTML(saved, gn) {
   return `
@@ -1180,13 +1416,357 @@ function delPlayer(id) {
 }
 
 // ════════════════════════════════════════════════════════════
+// PIN CONFIRM MODAL (reusable)
+// ════════════════════════════════════════════════════════════
+let _pinCB = null;
+function confirmWithPin(msg, cb) {
+  _pinCB = cb;
+  document.getElementById('pcm-msg').textContent = msg;
+  document.getElementById('pcm-pin').value = '';
+  document.getElementById('pcm-err').classList.add('hidden');
+  document.getElementById('pin-confirm-modal').classList.remove('hidden');
+  setTimeout(() => document.getElementById('pcm-pin').focus(), 100);
+}
+function doConfirmPin() {
+  if (document.getElementById('pcm-pin').value === getPin()) {
+    document.getElementById('pin-confirm-modal').classList.add('hidden');
+    if (_pinCB) _pinCB();
+    _pinCB = null;
+  } else {
+    document.getElementById('pcm-err').classList.remove('hidden');
+    document.getElementById('pcm-pin').classList.add('shake');
+    setTimeout(() => document.getElementById('pcm-pin').classList.remove('shake'), 400);
+  }
+}
+function cancelConfirmPin() {
+  document.getElementById('pin-confirm-modal').classList.add('hidden');
+  _pinCB = null;
+}
+
+// ════════════════════════════════════════════════════════════
+// ADMIN EVENT DETAIL — จัดการผู้เล่นต่อ event
+// ════════════════════════════════════════════════════════════
+function openAdminEventDetail(evId) {
+  S.curEv = evId;
+  showPage('adminEventDetail');
+}
+function renderAdminEventDetail() {
+  const evId = S.curEv; if (!evId) return;
+  const ev = getEvents().find(e => e.id === evId);
+  const regs = getRegs().filter(r => r.eventId === evId);
+  const players = getPlayers();
+  const unregPlayers = players.filter(p => !regs.some(r => r.playerId === p.id));
+  const cont = document.getElementById('aed-content');
+  cont.innerHTML = `
+    <div class="hero hero-g mb3" style="border-radius:24px">
+      <h2 style="font-size:20px;font-weight:900;margin-bottom:4px">${formatDate(ev.date)}</h2>
+      <p style="color:rgba(255,255,255,.7);font-size:13px">${ev.startTime||''} – ${ev.endTime||''} · ${ev.courts||1} คอร์ท</p>
+    </div>
+    ${unregPlayers.length ? `
+    <div class="card-lg mb3">
+      <div class="fw7 mb3">➕ เพิ่มผู้เล่นเข้าวันนี้</div>
+      <select id="aed-sel" class="inp mb3">
+        <option value="">-- เลือกผู้เล่น --</option>
+        ${unregPlayers.map(p=>`<option value="${p.id}">${p.name}</option>`).join('')}
+      </select>
+      <button class="btn btn-p" onclick="adminAddToEvent('${evId}')">✓ เพิ่มผู้เล่น</button>
+    </div>` : `<div class="card mb3 tc text-muted t-sm">ผู้เล่นทุกคนลงทะเบียนแล้ว</div>`}
+    <div class="card-lg card-p0">
+      <div class="lh">
+        <span class="fw7">ผู้เล่นที่ลงทะเบียน (${regs.length})</span>
+        <span class="t-xs text-muted">แตะ "ลบ" เพื่อนำออก</span>
+      </div>
+      ${regs.length ? regs.map((r,i)=>{
+        const p = players.find(pl=>pl.id===r.playerId);
+        return `<div class="lr">
+          <div class="av av-sm av-num">${i+1}</div>
+          <div class="f1">
+            <div class="fw6">${p?.name||'?'}</div>
+            <div class="t-xs ${r.type==='walkin'?'text-b':'text-muted'}">${r.type==='walkin'?'Walk-in':'ปกติ'} · ${r.paid?'✓ ยืนยันแล้ว':'รอจ่าย'}</div>
+          </div>
+          <button onclick="adminRemoveFromEvent('${r.id}','${evId}')"
+            style="border:none;background:#fef2f2;color:#ef4444;padding:6px 12px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">
+            ลบออก
+          </button>
+        </div>`;}).join('')
+      : '<div class="empty-txt tc" style="padding:20px">ยังไม่มีผู้เล่น</div>'}
+    </div>`;
+}
+function adminAddToEvent(evId) {
+  const sel = document.getElementById('aed-sel');
+  const playerId = sel.value;
+  if (!playerId) { toast('กรุณาเลือกผู้เล่น'); return; }
+  const player = getPlayers().find(p => p.id === playerId);
+  confirmWithPin(`เพิ่ม "${player?.name}" เข้าวันเล่นนี้?`, () => {
+    const regs = getRegs();
+    regs.push({id:uid(),eventId:evId,playerId,type:'regular',paid:false,slipUrl:null,slipAt:null,regAt:new Date().toISOString(),addedByAdmin:true});
+    saveRegs(regs);
+    renderAdminEventDetail();
+    toast(`เพิ่ม ${player?.name} แล้ว ✓`);
+  });
+}
+function adminRemoveFromEvent(regId, evId) {
+  const reg = getRegs().find(r => r.id === regId);
+  const player = getPlayers().find(p => p.id === reg?.playerId);
+  confirmWithPin(`ลบ "${player?.name||'?'}" ออกจากวันเล่นนี้?`, () => {
+    saveRegs(getRegs().filter(r => r.id !== regId));
+    renderAdminEventDetail();
+    toast(`ลบ ${player?.name||'?'} ออกแล้ว`);
+  });
+}
+
+// ════════════════════════════════════════════════════════════
+// EXPORT MATCH — PDF & Excel
+// ════════════════════════════════════════════════════════════
+function exportMatchPDF(evId) {
+  const saved = getMatches()[evId];
+  const ev = getEvents().find(e=>e.id===evId);
+  if (!saved) { toast('ยังไม่มีตารางแมทซ์'); return; }
+  const players = getPlayers();
+  const gn = id => players.find(p=>p.id===id)?.name||'?';
+  const rows = saved.rounds.map(r=>`
+    <tr>
+      <td style="text-align:center;font-weight:bold">${r.round}</td>
+      <td style="color:#065f46;font-weight:bold">${r.t1.map(gn).join(' / ')}</td>
+      <td style="text-align:center;color:#94a3b8">VS</td>
+      <td style="color:#1d4ed8;font-weight:bold">${r.t2.map(gn).join(' / ')}</td>
+      <td style="color:#94a3b8;font-size:12px">${r.sit?.length?r.sit.map(gn).join(', '):'-'}</td>
+    </tr>`).join('');
+  const numRows = saved.numAssign.map(({id,num})=>`<tr><td style="text-align:center;font-weight:900;font-size:18px">${num}</td><td style="font-weight:700">${gn(id)}</td></tr>`).join('');
+  const w = window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+    <title>ตารางแมทซ์ ${ev.date}</title>
+    <style>
+      body{font-family:sans-serif;padding:20px;max-width:900px;margin:0 auto;color:#1e293b}
+      h1{text-align:center;font-size:22px;margin-bottom:4px}
+      h2{text-align:center;font-size:14px;color:#64748b;margin-bottom:20px;font-weight:400}
+      table{width:100%;border-collapse:collapse;margin-bottom:20px;font-size:13px}
+      th{background:#065f46;color:#fff;padding:10px 8px;text-align:left}
+      td{border:1px solid #e2e8f0;padding:8px;vertical-align:middle}
+      tr:nth-child(even){background:#f8fafc}
+      .num-table{max-width:400px}
+      .no-print{margin-bottom:16px}
+      @media print{.no-print{display:none}}
+    </style>
+  </head><body>
+    <button class="no-print" onclick="window.print()"
+      style="padding:10px 20px;background:#065f46;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;font-weight:700">
+      🖨️ พิมพ์ / บันทึก PDF
+    </button>
+    <h1>🏸 ตารางแมทซ์แบดมินตัน</h1>
+    <h2>${formatDate(ev.date)} &nbsp;|&nbsp; ${ev.startTime||''} – ${ev.endTime||''} ${ev.location?'&nbsp;|&nbsp; '+ev.location:''}</h2>
+    <h3 style="font-size:14px;margin-bottom:8px">หมายเลขที่จับได้</h3>
+    <table class="num-table">
+      <tr><th>หมายเลข</th><th>ชื่อ</th></tr>${numRows}
+    </table>
+    <h3 style="font-size:14px;margin-bottom:8px">ตารางแมทซ์ (${saved.rounds.length} ตา)</h3>
+    <table>
+      <tr><th style="width:50px">ตา</th><th>ทีมเขียว 🟢</th><th style="width:40px">VS</th><th>ทีมน้ำเงิน 🔵</th><th>พัก</th></tr>
+      ${rows}
+    </table>
+    <script>window.addEventListener('load',()=>setTimeout(()=>window.print(),300))<\/script>
+  </body></html>`);
+  w.document.close();
+}
+function exportMatchExcel(evId) {
+  const saved = getMatches()[evId];
+  const ev = getEvents().find(e=>e.id===evId);
+  if (!saved) { toast('ยังไม่มีตารางแมทซ์'); return; }
+  if (typeof XLSX === 'undefined') { toast('⏳ กำลังโหลด Excel library...'); return; }
+  const players = getPlayers();
+  const gn = id => players.find(p=>p.id===id)?.name||'?';
+  const numData = [['หมายเลข','ชื่อ'], ...saved.numAssign.map(({id,num})=>[num, gn(id)])];
+  const matchData = [
+    ['ตาที่','ทีมเขียว','VS','ทีมน้ำเงิน','พัก'],
+    ...saved.rounds.map(r=>[r.round, r.t1.map(gn).join(' / '), 'VS', r.t2.map(gn).join(' / '), r.sit?.length?r.sit.map(gn).join(', '):'-'])
+  ];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(numData), 'หมายเลข');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(matchData), 'ตารางแมทซ์');
+  XLSX.writeFile(wb, `match_${ev.date}.xlsx`);
+  toast('ดาวน์โหลด Excel แล้ว ✓');
+}
+
+// ════════════════════════════════════════════════════════════
+// MONTHLY PAYMENT — ผู้เล่น
+// ════════════════════════════════════════════════════════════
+const getMonthlyPay = () => CACHE.monthlyPay || {};
+function getMonthKey(d) {
+  const dt = d || new Date();
+  return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}`;
+}
+function openMonthlyPayment() {
+  if (!S.player) { toast('กรุณาเลือกชื่อก่อน'); return; }
+  showPage('monthlyPayment');
+}
+function renderMonthlyPayment() {
+  const pid = S.player?.id; if (!pid) return;
+  const now = new Date();
+  const mk = getMonthKey(now);
+  const mp = getMonthlyPay();
+  const myPay = mp[pid]?.[mk];
+  const events = getEvents(), regs = getRegs();
+  const ms = new Date(now.getFullYear(), now.getMonth(), 1);
+  const me = new Date(now.getFullYear(), now.getMonth()+1, 0);
+  const myEvs = events.filter(ev => {
+    const d = new Date(ev.date+'T00:00:00');
+    return d >= ms && d <= me && regs.some(r=>r.eventId===ev.id && r.playerId===pid);
+  });
+  const cont = document.getElementById('mp-content');
+  cont.innerHTML = `
+    <div class="hero hero-am mb4" style="border-radius:28px">
+      <div style="font-size:28px;margin-bottom:8px">💳</div>
+      <h2 style="font-size:20px;font-weight:900;margin-bottom:4px">ชำระเงินประจำเดือน</h2>
+      <p style="color:rgba(255,255,255,.75);font-size:14px">${TM[now.getMonth()]} ${now.getFullYear()+543}</p>
+      <p style="color:rgba(255,255,255,.6);font-size:13px;margin-top:4px">👤 ${S.player?.name}</p>
+    </div>
+    <div class="card mb3">
+      <div class="fw7 mb2">📅 วันที่ลงทะเบียนเดือนนี้ (${myEvs.length} วัน)</div>
+      ${myEvs.length
+        ? myEvs.map(ev=>`<div class="sum-row"><span class="sum-lbl">${formatDate(ev.date)}</span><span class="badge bg">จอง ✓</span></div>`).join('')
+        : '<div class="t-sm text-muted" style="padding:8px 0">ยังไม่มีวันเล่นที่จองในเดือนนี้</div>'}
+    </div>
+    ${myPay?.paid
+      ? `<div style="background:#ecfdf5;border:2px solid #a7f3d0;border-radius:20px;padding:24px;text-align:center;margin-bottom:12px">
+          <div style="font-size:42px;margin-bottom:8px">✅</div>
+          <div class="fw9 text-g" style="font-size:18px">แอดมินยืนยันแล้ว!</div>
+          ${myPay.paidAt?`<div class="t-xs text-muted mt2">ยืนยันเมื่อ ${fmtDT(myPay.paidAt)}</div>`:''}
+         </div>`
+      : myPay?.slipUrl
+        ? `<div style="background:#fffbeb;border:2px solid #fde68a;border-radius:20px;padding:20px;text-align:center;margin-bottom:12px">
+            <div style="font-size:32px;margin-bottom:6px">⏳</div>
+            <div class="fw7 text-am" style="font-size:16px">รอแอดมินยืนยัน</div>
+            <div class="t-xs text-muted mt2">ส่งสลิปเมื่อ ${fmtDT(myPay.slipAt)}</div>
+           </div>
+           <button class="btn btn-s mb3" onclick="viewMonthlySlip('${pid}','${mk}')">📷 ดูสลิปที่ส่งแล้ว</button>`
+        : `<div class="card-lg mb3">
+            <div class="fw7 mb2">📎 แนบสลิปชำระเงินเดือนนี้</div>
+            <p class="t-sm text-muted mb3">ส่งสลิปโอนเงินรวมทุกวันที่เล่นในเดือน${TM[now.getMonth()]}</p>
+            <input type="file" id="mp-inp" accept="image/*" capture="environment" class="inp" style="padding:10px;font-size:13px;margin-bottom:12px">
+            <div id="mp-prev" class="hidden mb3">
+              <img id="mp-img" class="slip-img" alt="slip">
+              <button onclick="clearMPSlip()" style="background:rgba(0,0,0,.5);color:#fff;border:none;border-radius:999px;padding:4px 12px;font-size:12px;cursor:pointer">✕ ลบ</button>
+            </div>
+            <button class="btn btn-p" onclick="submitMonthlySlip('${pid}','${mk}')">📤 ส่งสลิป</button>
+          </div>`}
+    <button class="btn-ghost w100 tc mt2" onclick="showPage('calendar')">← กลับหน้าปฏิทิน</button>`;
+  setTimeout(() => {
+    const inp = document.getElementById('mp-inp');
+    if (inp) inp.addEventListener('change', function() {
+      if (!this.files[0]) return;
+      const r = new FileReader(); r.onload = e => {
+        document.getElementById('mp-img').src = e.target.result;
+        document.getElementById('mp-prev').classList.remove('hidden');
+      }; r.readAsDataURL(this.files[0]);
+    });
+  }, 100);
+}
+function clearMPSlip() {
+  document.getElementById('mp-inp').value = '';
+  document.getElementById('mp-prev').classList.add('hidden');
+}
+async function submitMonthlySlip(playerId, monthKey) {
+  const inp = document.getElementById('mp-inp');
+  if (!inp?.files[0]) { toast('กรุณาเลือกรูปสลิปก่อน'); return; }
+  toast('⏳ กำลังอัปโหลดสลิป...');
+  try {
+    const img = await compressImage(inp.files[0]);
+    const data = { slipUrl: img, slipAt: new Date().toISOString(), paid: false, paidAt: null };
+    CACHE.monthlyPay[playerId] = CACHE.monthlyPay[playerId] || {};
+    CACHE.monthlyPay[playerId][monthKey] = data;
+    fRef(`/monthlyPay/${playerId}/${monthKey}`).set(data);
+    toast('ส่งสลิปแล้ว รอแอดมินยืนยัน ✓');
+    renderMonthlyPayment();
+  } catch(e) { console.error(e); toast('อัปโหลดไม่สำเร็จ ลองใหม่'); }
+}
+function viewMonthlySlip(playerId, monthKey) {
+  const url = getMonthlyPay()[playerId]?.[monthKey]?.slipUrl;
+  if (url) { const w=window.open('','_blank'); w.document.write(`<html><body style="margin:0;background:#000;display:flex;justify-content:center;align-items:center;min-height:100vh"><img src="${url}" style="max-width:100%;max-height:100vh"></body></html>`); }
+}
+
+// ════════════════════════════════════════════════════════════
+// ADMIN MONTHLY PAY — ยืนยันการชำระเงินรายเดือน
+// ════════════════════════════════════════════════════════════
+function openAdminMonthlyPay() { showPage('adminMonthlyPay'); }
+function renderAdminMonthlyPay() {
+  const players = getPlayers();
+  const mp = getMonthlyPay();
+  const now = new Date();
+  const mk = getMonthKey(now);
+  const regs = getRegs(), events = getEvents();
+  const ms = new Date(now.getFullYear(), now.getMonth(), 1);
+  const me = new Date(now.getFullYear(), now.getMonth()+1, 0);
+  const monthEvs = events.filter(ev => { const d=new Date(ev.date+'T00:00:00'); return d>=ms&&d<=me; });
+  const confirmedCount = players.filter(p => mp[p.id]?.[mk]?.paid).length;
+  const cont = document.getElementById('amp-content');
+  cont.innerHTML = `
+    <div class="hero hero-am mb4" style="border-radius:24px">
+      <div class="row-b">
+        <div>
+          <h2 style="font-size:18px;font-weight:900;margin-bottom:4px">💳 ชำระเงินประจำเดือน</h2>
+          <p style="color:rgba(255,255,255,.75);font-size:13px">${TM[now.getMonth()]} ${now.getFullYear()+543}</p>
+        </div>
+        <div style="background:rgba(255,255,255,.2);border-radius:14px;padding:10px 16px;text-align:center">
+          <div style="font-size:28px;font-weight:900;color:#fff">${confirmedCount}/${players.length}</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.7)">ยืนยันแล้ว</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-lg card-p0">
+      <div class="lh"><span class="fw7">รายชื่อสมาชิก</span></div>
+      ${players.map(p => {
+        const pay = mp[p.id]?.[mk];
+        const cnt = monthEvs.filter(ev=>regs.some(r=>r.eventId===ev.id&&r.playerId===p.id)).length;
+        return `<div class="lr" style="flex-wrap:wrap;gap:6px">
+          <div class="av">${firstChar(p.name)}</div>
+          <div class="f1">
+            <div class="fw7">${p.name}</div>
+            <div class="t-xs text-muted">เล่น ${cnt} วันในเดือนนี้</div>
+            ${pay?.slipAt?`<div class="t-xs text-am mt1">📎 ส่งสลิป ${fmtDT(pay.slipAt)}</div>`:''}
+          </div>
+          <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">
+            ${pay?.slipUrl?`<button style="background:#fef3c7;color:#92400e;border:none;padding:5px 10px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit" onclick="viewMonthlySlip('${p.id}','${mk}')">📷 สลิป</button>`:''}
+            <button onclick="toggleMonthlyPaid('${p.id}','${mk}')"
+              style="border:none;padding:7px 14px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;background:${pay?.paid?'#d1fae5':'#f1f5f9'};color:${pay?.paid?'#065f46':'#64748b'}">
+              ${pay?.paid?'✓ ยืนยันแล้ว':'ยืนยัน'}
+            </button>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+}
+function toggleMonthlyPaid(playerId, monthKey) {
+  const mp = getMonthlyPay();
+  mp[playerId] = mp[playerId] || {};
+  mp[playerId][monthKey] = mp[playerId][monthKey] || {};
+  const nowPaid = !mp[playerId][monthKey].paid;
+  const paidAt = nowPaid ? new Date().toISOString() : null;
+  mp[playerId][monthKey].paid = nowPaid;
+  mp[playerId][monthKey].paidAt = paidAt;
+  CACHE.monthlyPay = mp;
+  fRef(`/monthlyPay/${playerId}/${monthKey}`).update({ paid: nowPaid, paidAt });
+  // ถ้ายืนยัน → mark all regs ในเดือนนั้นว่า paid ด้วย
+  if (nowPaid) {
+    const [y, m] = monthKey.split('-').map(Number);
+    const ms = new Date(y, m-1, 1), me = new Date(y, m, 0);
+    const regs = getRegs();
+    let changed = false;
+    regs.forEach(r => {
+      if (r.playerId === playerId) {
+        const ev = getEvents().find(e=>e.id===r.eventId);
+        if (ev) { const d=new Date(ev.date+'T00:00:00'); if(d>=ms&&d<=me){r.paid=true;r.paidAt=paidAt;changed=true;} }
+      }
+    });
+    if (changed) saveRegs(regs);
+  }
+  renderAdminMonthlyPay();
+  toast(nowPaid ? '✓ ยืนยันการชำระแล้ว' : 'ยกเลิกสถานะแล้ว');
+}
+
+// ════════════════════════════════════════════════════════════
 // UTILITIES
 // ════════════════════════════════════════════════════════════
-function firstChar(name) {
-  // ตัดตัวอักษรพิเศษไทยที่นำหน้า แล้วเอาตัวแรก
-  const clean = name.replace(/^[เแโใไ]/u, match => match); // keep as-is
-  return name.charAt(0) || '?';
-}
+function firstChar(name) { return name.charAt(0) || '?'; }
 function formatDate(ds) {
   const d = new Date(ds+'T00:00:00');
   return `${TD[d.getDay()]}ที่ ${d.getDate()} ${TS[d.getMonth()]} ${d.getFullYear()+543}`;
@@ -1200,22 +1780,6 @@ function toast(msg) {
   const el = document.getElementById('toast'); el.textContent=msg; el.classList.remove('hidden');
   clearTimeout(tTimer); tTimer = setTimeout(()=>el.classList.add('hidden'), 2800);
 }
-
-// ════════════════════════════════════════════════════════════
-// INIT — โหลดข้อมูลผู้เล่นตัวอย่าง (สมาชิกจริงของกลุ่ม)
-// ════════════════════════════════════════════════════════════
-(function init() {
-  if (!getPlayers().length) {
-    savePlayers([
-      {id:uid(),name:'ตั๊ก'},{id:uid(),name:'ก้อย'},{id:uid(),name:'ฟาง'},
-      {id:uid(),name:'ปุ๋ย'},{id:uid(),name:'เบียร์'},{id:uid(),name:'ดา'},
-      {id:uid(),name:'แนน'},{id:uid(),name:'เกมส์'},{id:uid(),name:'นัท'},
-      {id:uid(),name:'ทิว'},{id:uid(),name:'เบลล์'},{id:uid(),name:'ยุ้ย'},
-      {id:uid(),name:'ป๊อป'},{id:uid(),name:'โอห์ม'},{id:uid(),name:'เอิร์ธ'},
-    ]);
-  }
-  showPage('landing');
-})();
 </script>
 </body>
 </html>
