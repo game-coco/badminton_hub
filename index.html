@@ -1444,7 +1444,7 @@ function cancelConfirmPin() {
 }
 
 // ════════════════════════════════════════════════════════════
-// ADMIN EVENT DETAIL — จัดการผู้เล่นต่อ event
+// ADMIN EVENT DETAIL — จัดการผู้เล่นต่อ event (multi-select)
 // ════════════════════════════════════════════════════════════
 function openAdminEventDetail(evId) {
   S.curEv = evId;
@@ -1462,56 +1462,116 @@ function renderAdminEventDetail() {
       <h2 style="font-size:20px;font-weight:900;margin-bottom:4px">${formatDate(ev.date)}</h2>
       <p style="color:rgba(255,255,255,.7);font-size:13px">${ev.startTime||''} – ${ev.endTime||''} · ${ev.courts||1} คอร์ท</p>
     </div>
+
     ${unregPlayers.length ? `
     <div class="card-lg mb3">
-      <div class="fw7 mb3">➕ เพิ่มผู้เล่นเข้าวันนี้</div>
-      <select id="aed-sel" class="inp mb3">
-        <option value="">-- เลือกผู้เล่น --</option>
-        ${unregPlayers.map(p=>`<option value="${p.id}">${p.name}</option>`).join('')}
-      </select>
-      <button class="btn btn-p" onclick="adminAddToEvent('${evId}')">✓ เพิ่มผู้เล่น</button>
-    </div>` : `<div class="card mb3 tc text-muted t-sm">ผู้เล่นทุกคนลงทะเบียนแล้ว</div>`}
+      <div class="row-b mb2">
+        <div class="fw7">➕ เพิ่มผู้เล่น</div>
+        <button onclick="aedToggleAll('add')"
+          style="background:none;border:none;color:var(--g2);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;padding:4px 8px">
+          เลือกทั้งหมด
+        </button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px">
+        ${unregPlayers.map(p=>`
+        <label style="display:flex;align-items:center;gap:10px;padding:11px 14px;border:2px solid var(--gray-b);border-radius:12px;cursor:pointer;transition:border-color .15s;user-select:none"
+          onmouseenter="this.style.borderColor='#6ee7b7'" onmouseleave="this.style.borderColor=this.querySelector('input').checked?'#10b981':'#e2e8f0'">
+          <input type="checkbox" class="aed-add-cb" value="${p.id}" onchange="aedCountAdd(this.closest('label'))"
+            style="width:18px;height:18px;accent-color:var(--g2);cursor:pointer;flex-shrink:0">
+          <div class="av av-sm">${firstChar(p.name)}</div>
+          <span class="fw6 f1">${p.name}</span>
+        </label>`).join('')}
+      </div>
+      <button id="aed-add-btn" class="btn btn-p" onclick="adminAddSelected('${evId}')" disabled style="opacity:.45">
+        ✓ เพิ่มผู้เล่น <span id="aed-add-count">(0 คน)</span>
+      </button>
+    </div>` : `<div class="card mb3 tc text-muted t-sm" style="padding:16px">✅ ผู้เล่นทุกคนลงทะเบียนแล้ว</div>`}
+
     <div class="card-lg card-p0">
       <div class="lh">
         <span class="fw7">ผู้เล่นที่ลงทะเบียน (${regs.length})</span>
-        <span class="t-xs text-muted">แตะ "ลบ" เพื่อนำออก</span>
+        ${regs.length ? `
+        <button onclick="aedToggleAll('rm')"
+          style="background:none;border:none;color:#ef4444;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;padding:4px 8px">
+          เลือกทั้งหมด
+        </button>` : ''}
       </div>
-      ${regs.length ? regs.map((r,i)=>{
-        const p = players.find(pl=>pl.id===r.playerId);
-        return `<div class="lr">
-          <div class="av av-sm av-num">${i+1}</div>
-          <div class="f1">
-            <div class="fw6">${p?.name||'?'}</div>
-            <div class="t-xs ${r.type==='walkin'?'text-b':'text-muted'}">${r.type==='walkin'?'Walk-in':'ปกติ'} · ${r.paid?'✓ ยืนยันแล้ว':'รอจ่าย'}</div>
-          </div>
-          <button onclick="adminRemoveFromEvent('${r.id}','${evId}')"
-            style="border:none;background:#fef2f2;color:#ef4444;padding:6px 12px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">
-            ลบออก
-          </button>
-        </div>`;}).join('')
-      : '<div class="empty-txt tc" style="padding:20px">ยังไม่มีผู้เล่น</div>'}
+      ${regs.length ? `
+      <div style="display:flex;flex-direction:column">
+        ${regs.map((r,i)=>{
+          const p = players.find(pl=>pl.id===r.playerId);
+          return `<label style="display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid #f8fafc;cursor:pointer;transition:background .1s;user-select:none"
+            onmouseenter="this.style.background='#fef2f2'" onmouseleave="this.style.background=''">
+            <input type="checkbox" class="aed-rm-cb" value="${r.id}" onchange="aedCountRm()"
+              style="width:18px;height:18px;accent-color:#ef4444;cursor:pointer;flex-shrink:0">
+            <div class="av av-sm ${r.type==='walkin'?'av-bl':'av-num'}">${i+1}</div>
+            <div class="f1">
+              <div class="fw6">${p?.name||'?'}</div>
+              <div class="t-xs ${r.type==='walkin'?'text-b':'text-muted'}">${r.type==='walkin'?'Walk-in':'ปกติ'} · ${r.paid?'✓ ยืนยันแล้ว':'รอจ่าย'}</div>
+            </div>
+          </label>`;}).join('')}
+      </div>
+      <div style="padding:12px 16px;border-top:2px solid var(--gray-b)">
+        <button id="aed-rm-btn" class="btn btn-d" onclick="adminRemoveSelected('${evId}')" disabled style="opacity:.45;margin-bottom:0">
+          🗑 ลบที่เลือก <span id="aed-rm-count">(0 คน)</span>
+        </button>
+      </div>` : '<div class="empty-txt tc" style="padding:20px">ยังไม่มีผู้เล่น</div>'}
     </div>`;
 }
-function adminAddToEvent(evId) {
-  const sel = document.getElementById('aed-sel');
-  const playerId = sel.value;
-  if (!playerId) { toast('กรุณาเลือกผู้เล่น'); return; }
-  const player = getPlayers().find(p => p.id === playerId);
-  confirmWithPin(`เพิ่ม "${player?.name}" เข้าวันเล่นนี้?`, () => {
+
+function aedCountAdd(lbl) {
+  const n = document.querySelectorAll('.aed-add-cb:checked').length;
+  const btn = document.getElementById('aed-add-btn');
+  const cnt = document.getElementById('aed-add-count');
+  if (cnt) cnt.textContent = `(${n} คน)`;
+  if (btn) { btn.disabled = n===0; btn.style.opacity = n===0?'.45':'1'; }
+  if (lbl) lbl.style.borderColor = lbl.querySelector('input').checked ? '#10b981' : '#e2e8f0';
+}
+function aedCountRm() {
+  const n = document.querySelectorAll('.aed-rm-cb:checked').length;
+  const btn = document.getElementById('aed-rm-btn');
+  const cnt = document.getElementById('aed-rm-count');
+  if (cnt) cnt.textContent = `(${n} คน)`;
+  if (btn) { btn.disabled = n===0; btn.style.opacity = n===0?'.45':'1'; }
+}
+function aedToggleAll(mode) {
+  const cbs = document.querySelectorAll(mode==='add' ? '.aed-add-cb' : '.aed-rm-cb');
+  const allOn = [...cbs].every(c => c.checked);
+  cbs.forEach(c => { c.checked = !allOn; });
+  if (mode==='add') {
+    document.querySelectorAll('.aed-add-cb').forEach(c => {
+      aedCountAdd(c.closest('label'));
+    });
+  } else { aedCountRm(); }
+}
+
+function adminAddSelected(evId) {
+  const selected = [...document.querySelectorAll('.aed-add-cb:checked')].map(c => c.value);
+  if (!selected.length) return;
+  const players = getPlayers();
+  const names = selected.map(id => players.find(p=>p.id===id)?.name).filter(Boolean).join(', ');
+  confirmWithPin(`เพิ่ม ${selected.length} คน\n(${names})\nเข้าวันเล่นนี้?`, () => {
     const regs = getRegs();
-    regs.push({id:uid(),eventId:evId,playerId,type:'regular',paid:false,slipUrl:null,slipAt:null,regAt:new Date().toISOString(),addedByAdmin:true});
+    selected.forEach(playerId => {
+      regs.push({id:uid(),eventId:evId,playerId,type:'regular',paid:false,slipUrl:null,slipAt:null,regAt:new Date().toISOString(),addedByAdmin:true});
+    });
     saveRegs(regs);
     renderAdminEventDetail();
-    toast(`เพิ่ม ${player?.name} แล้ว ✓`);
+    toast(`เพิ่ม ${selected.length} คนแล้ว ✓`);
   });
 }
-function adminRemoveFromEvent(regId, evId) {
-  const reg = getRegs().find(r => r.id === regId);
-  const player = getPlayers().find(p => p.id === reg?.playerId);
-  confirmWithPin(`ลบ "${player?.name||'?'}" ออกจากวันเล่นนี้?`, () => {
-    saveRegs(getRegs().filter(r => r.id !== regId));
+function adminRemoveSelected(evId) {
+  const selected = [...document.querySelectorAll('.aed-rm-cb:checked')].map(c => c.value);
+  if (!selected.length) return;
+  const regs = getRegs(), players = getPlayers();
+  const names = selected.map(id => {
+    const r = regs.find(r=>r.id===id);
+    return players.find(p=>p.id===r?.playerId)?.name;
+  }).filter(Boolean).join(', ');
+  confirmWithPin(`ลบ ${selected.length} คน\n(${names})\nออกจากวันเล่นนี้?`, () => {
+    saveRegs(regs.filter(r => !selected.includes(r.id)));
     renderAdminEventDetail();
-    toast(`ลบ ${player?.name||'?'} ออกแล้ว`);
+    toast(`ลบ ${selected.length} คนออกแล้ว`);
   });
 }
 
