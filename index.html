@@ -84,8 +84,8 @@ select.inp{appearance:auto}
 .br{background:#fee2e2;color:#991b1b}
 
 /* ─── AVATARS ────────────────────────────────────────────── */
-.av{width:46px;height:46px;min-width:46px;border-radius:50%;background:linear-gradient(135deg,#34d399,#059669);color:#fff;font-weight:900;font-size:18px;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(5,150,105,.3)}
-.av-sm{width:34px;height:34px;min-width:34px;font-size:14px}
+.av{width:46px;height:46px;min-width:46px;border-radius:50%;background:linear-gradient(135deg,#34d399,#059669);color:#fff;font-weight:900;font-size:11px;line-height:1.25;word-break:break-all;text-align:center;padding:4px;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(5,150,105,.3)}
+.av-sm{width:34px;height:34px;min-width:34px;font-size:9px;padding:2px}
 .av-num{background:#ecfdf5;color:#065f46;box-shadow:none;border:2px solid #a7f3d0;font-size:13px;font-weight:900}
 .av-bl{background:linear-gradient(135deg,#60a5fa,#2563eb);box-shadow:0 3px 10px rgba(37,99,235,.3)}
 .av-gray{background:#e2e8f0;color:#9ca3af;box-shadow:none}
@@ -344,7 +344,10 @@ input[type=file]::file-selector-button{background:var(--g2);color:#fff;border:no
     </div>
     <p class="t-sm fw7 text-gray mb3" style="text-transform:uppercase;letter-spacing:.5px">วันเล่นที่กำลังจะมาถึง</p>
     <div id="upcoming"></div>
-    <button class="btn btn-am mt3" onclick="openMonthlyPayment()">💳 ชำระเงินประจำเดือน</button>
+    <div class="btn-row mt3">
+      <button class="btn btn-p f1" onclick="openPlayerMatches()">🎯 สุ่มคู่แมทซ์</button>
+      <button class="btn btn-am f1" onclick="openMonthlyPayment()">💳 ชำระเงินประจำเดือน</button>
+    </div>
   </div>
 </div>
 
@@ -530,6 +533,20 @@ input[type=file]::file-selector-button{background:var(--g2);color:#fff;border:no
 </div>
 
 <!-- ╔══════════════════════════════════════════════════════╗ -->
+<!-- ║  PLAYER MATCHES (ดูตารางแมทซ์ — ผู้เล่น)           ║ -->
+<!-- ╚══════════════════════════════════════════════════════╝ -->
+<div id="page-playerMatches" class="page">
+  <div class="wrap">
+    <h2 style="font-size:20px;font-weight:800;margin-bottom:16px">🎯 สุ่มคู่ผู้เล่น</h2>
+    <div class="card mb4">
+      <label class="lbl">เลือกวันเล่น</label>
+      <select id="pm-sel" class="inp" onchange="renderPlayerMatchContent()"></select>
+    </div>
+    <div id="pm-content"></div>
+  </div>
+</div>
+
+<!-- ╔══════════════════════════════════════════════════════╗ -->
 <!-- ║  ADMIN EVENT DETAIL (จัดการผู้เล่นต่อ event)         ║ -->
 <!-- ╚══════════════════════════════════════════════════════╝ -->
 <div id="page-adminEventDetail" class="page">
@@ -691,6 +708,7 @@ function refreshCurrentPage() {
   else if (p==='register'        && S.curEv) openEv(S.curEv);
   else if (p==='walkin'          && S.curEv) openWI(S.curEv);
   else if (p==='payment'         && S.curEv) openPay(S.curEv);
+  else if (p==='playerMatches')              renderPlayerMatches();
   else if (p==='adminEventDetail'&& S.curEv) renderAdminEventDetail();
   else if (p==='monthlyPayment')             renderMonthlyPayment();
   else if (p==='adminMonthlyPay')            renderAdminMonthlyPay();
@@ -754,6 +772,7 @@ function showPage(p) {
   if (p==='adminCosts')        initCost();
   if (p==='adminMatches')      initMatch();
   if (p==='overview')          renderOverview();
+  if (p==='playerMatches')     renderPlayerMatches();
   if (p==='adminEventDetail')  renderAdminEventDetail();
   if (p==='monthlyPayment')    renderMonthlyPayment();
   if (p==='adminMonthlyPay')   renderAdminMonthlyPay();
@@ -1399,20 +1418,96 @@ function adminAddPlayer() {
   apOpen=false; document.getElementById('ap-form').classList.add('hidden');
   renderApList(); toast('เพิ่ม '+name+' แล้ว ✓');
 }
+let _apDragIdx = null;
 function renderApList() {
   const players = getPlayers();
   const cont = document.getElementById('ap-list');
   if (!players.length) { cont.innerHTML='<div class="empty"><div class="empty-ico">👥</div><p class="empty-txt">ยังไม่มีผู้เล่น</p></div>'; return; }
-  cont.innerHTML = `<div class="card-lg card-p0">${players.map(p=>`
-    <div class="lr">
+  cont.innerHTML = `
+    <p class="t-xs text-muted mb2" style="padding:0 2px">⠿ ลากเพื่อเรียงลำดับ</p>
+    <div class="card-lg card-p0">${players.map((p,i)=>`
+    <div class="lr ap-drag-row" draggable="true" data-i="${i}"
+      ondragstart="apDS(event,${i})" ondragover="apDO(event,${i})" ondrop="apDP(event,${i})" ondragend="apDE()"
+      style="cursor:grab;transition:background .1s">
+      <span style="color:#cbd5e1;font-size:20px;user-select:none;padding:0 4px 0 0;cursor:grab">⠿</span>
       <div class="av">${firstChar(p.name)}</div>
       <span class="fw7 f1">${p.name}</span>
-      <button onclick="delPlayer('${p.id}')" style="background:transparent;border:none;color:#94a3b8;font-size:13px;padding:6px 10px;border-radius:8px;cursor:pointer" onmouseover="this.style.background='#fef2f2';this.style.color='#ef4444'" onmouseout="this.style.background='transparent';this.style.color='#94a3b8'">ลบ</button>
+      <button onclick="event.stopPropagation();delPlayer('${p.id}')"
+        style="background:transparent;border:none;color:#94a3b8;font-size:13px;padding:6px 10px;border-radius:8px;cursor:pointer"
+        onmouseover="this.style.background='#fef2f2';this.style.color='#ef4444'"
+        onmouseout="this.style.background='transparent';this.style.color='#94a3b8'">ลบ</button>
     </div>`).join('')}</div>`;
 }
+function apDS(e,i){ _apDragIdx=i; e.dataTransfer.effectAllowed='move'; setTimeout(()=>e.target.closest('.ap-drag-row').style.opacity='.4',0); }
+function apDO(e,i){ e.preventDefault(); document.querySelectorAll('.ap-drag-row').forEach(el=>el.style.background=''); e.currentTarget.style.background='#ecfdf5'; }
+function apDE(){ document.querySelectorAll('.ap-drag-row').forEach(el=>{el.style.opacity='1';el.style.background='';}); }
+function apDP(e,i){ e.preventDefault(); if(_apDragIdx===null||_apDragIdx===i){_apDragIdx=null;return;} const pl=getPlayers(); const[m]=pl.splice(_apDragIdx,1); pl.splice(i,0,m); _apDragIdx=null; savePlayers(pl); }
 function delPlayer(id) {
   if(!confirm('ลบผู้เล่นนี้?')) return;
   savePlayers(getPlayers().filter(p=>p.id!==id)); renderApList(); toast('ลบแล้ว');
+}
+
+// ════════════════════════════════════════════════════════════
+// PLAYER MATCHES — สุ่มคู่ฝั่งผู้เล่น
+// ════════════════════════════════════════════════════════════
+function openPlayerMatches() { showPage('playerMatches'); }
+function renderPlayerMatches() {
+  const events = getEvents().sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const sel = document.getElementById('pm-sel');
+  if (!sel) return;
+  sel.innerHTML = events.map(e=>`<option value="${e.id}">${formatDate(e.date)}</option>`).join('');
+  if (S.curEv) sel.value = S.curEv;
+  if (events.length) renderPlayerMatchContent();
+  else document.getElementById('pm-content').innerHTML='<div class="empty"><div class="empty-ico">🎯</div><p class="empty-txt">ยังไม่มีวันเล่น</p></div>';
+}
+function renderPlayerMatchContent() {
+  const evId = document.getElementById('pm-sel')?.value;
+  if (!evId) return;
+  const regs = getRegs().filter(r=>r.eventId===evId);
+  const players = getPlayers();
+  const saved = getMatches()[evId];
+  const n = regs.length;
+  const gn = id => players.find(p=>p.id===id)?.name||'?';
+  document.getElementById('pm-content').innerHTML = `
+    <div class="card mb3">
+      <div class="fw7 mb1">ผู้เล่นวันนี้: <span class="text-g">${n} คน</span></div>
+      <div class="t-sm text-muted">${regs.map(r=>{const p=players.find(pl=>pl.id===r.playerId);return`<span style="display:inline-block;background:var(--gray-l);border-radius:8px;padding:2px 8px;margin:2px;font-size:12px">${p?.name||'?'}</span>`;}).join('')}</div>
+    </div>
+    ${n < 5
+      ? `<div class="empty"><div class="empty-ico">⚠️</div><p class="empty-txt">ต้องการผู้เล่นอย่างน้อย 5 คน<br>(ตอนนี้มี ${n} คน)</p></div>`
+      : `<button class="btn btn-p mb3" onclick="doPlayerRandomize('${evId}')">🎲 ${saved?'สุ่มใหม่':'สุ่มผู้เล่น'}</button>
+         ${saved
+           ? `<div class="btn-row mb4">
+                <button class="btn btn-sm btn-bl f1" onclick="exportMatchPDF('${evId}')">📄 PDF</button>
+                <button class="btn btn-sm btn-og f1" onclick="exportMatchExcel('${evId}')">📊 Excel</button>
+              </div>${renderSimpleMatchHTML(saved, gn)}`
+           : '<div class="empty-txt tc">กดสุ่มเพื่อจับคู่</div>'}`}`;
+}
+function doPlayerRandomize(evId) {
+  const regs = getRegs().filter(r=>r.eventId===evId);
+  const n = regs.length; if(n<5){toast('ต้องการผู้เล่นอย่างน้อย 5 คน');return;}
+  const shuffled = [...regs.map(r=>r.playerId)].sort(()=>Math.random()-.5);
+  const sched = getSchedule(Math.min(n,12));
+  const rounds = [];
+  for (let i=0;i<30;i++) rounds.push(buildRound(sched,i,n,shuffled));
+  const numAssign = shuffled.slice(0,n).map((id,i)=>({id,num:i+1}));
+  const m = getMatches(); m[evId]={rounds,numAssign,at:new Date().toISOString()};
+  saveMatches(m); renderPlayerMatchContent(); toast('สุ่ม 30 ตาแล้ว! 🎉');
+}
+function renderSimpleMatchHTML(saved, gn) {
+  return `
+    <div class="fw7 mb3">📋 ตารางแมทซ์ (${saved.rounds.length} ตา)</div>
+    ${saved.rounds.map(r=>`
+      <div class="match-card">
+        <div class="match-hd"><span class="fw7 text-am">ตาที่ ${r.round}</span></div>
+        <div class="match-bd">
+          <div class="teams">
+            <div class="team tg">${r.t1.map(id=>`<div class="t-name green">${gn(id)}</div>`).join('')}</div>
+            <div class="vs">VS</div>
+            <div class="team tb">${r.t2.map(id=>`<div class="t-name blue">${gn(id)}</div>`).join('')}</div>
+          </div>
+        </div>
+      </div>`).join('')}`;
 }
 
 // ════════════════════════════════════════════════════════════
@@ -1586,25 +1681,22 @@ function exportMatchPDF(evId) {
   const gn = id => players.find(p=>p.id===id)?.name||'?';
   const rows = saved.rounds.map(r=>`
     <tr>
-      <td style="text-align:center;font-weight:bold">${r.round}</td>
+      <td style="text-align:center;font-weight:bold;width:50px">${r.round}</td>
       <td style="color:#065f46;font-weight:bold">${r.t1.map(gn).join(' / ')}</td>
-      <td style="text-align:center;color:#94a3b8">VS</td>
+      <td style="text-align:center;color:#94a3b8;width:40px">VS</td>
       <td style="color:#1d4ed8;font-weight:bold">${r.t2.map(gn).join(' / ')}</td>
-      <td style="color:#94a3b8;font-size:12px">${r.sit?.length?r.sit.map(gn).join(', '):'-'}</td>
     </tr>`).join('');
-  const numRows = saved.numAssign.map(({id,num})=>`<tr><td style="text-align:center;font-weight:900;font-size:18px">${num}</td><td style="font-weight:700">${gn(id)}</td></tr>`).join('');
   const w = window.open('','_blank');
   w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
     <title>ตารางแมทซ์ ${ev.date}</title>
     <style>
-      body{font-family:sans-serif;padding:20px;max-width:900px;margin:0 auto;color:#1e293b}
+      body{font-family:sans-serif;padding:20px;max-width:800px;margin:0 auto;color:#1e293b}
       h1{text-align:center;font-size:22px;margin-bottom:4px}
       h2{text-align:center;font-size:14px;color:#64748b;margin-bottom:20px;font-weight:400}
       table{width:100%;border-collapse:collapse;margin-bottom:20px;font-size:13px}
       th{background:#065f46;color:#fff;padding:10px 8px;text-align:left}
-      td{border:1px solid #e2e8f0;padding:8px;vertical-align:middle}
+      td{border:1px solid #e2e8f0;padding:9px 8px;vertical-align:middle}
       tr:nth-child(even){background:#f8fafc}
-      .num-table{max-width:400px}
       .no-print{margin-bottom:16px}
       @media print{.no-print{display:none}}
     </style>
@@ -1615,13 +1707,8 @@ function exportMatchPDF(evId) {
     </button>
     <h1>🏸 ตารางแมทซ์แบดมินตัน</h1>
     <h2>${formatDate(ev.date)} &nbsp;|&nbsp; ${ev.startTime||''} – ${ev.endTime||''} ${ev.location?'&nbsp;|&nbsp; '+ev.location:''}</h2>
-    <h3 style="font-size:14px;margin-bottom:8px">หมายเลขที่จับได้</h3>
-    <table class="num-table">
-      <tr><th>หมายเลข</th><th>ชื่อ</th></tr>${numRows}
-    </table>
-    <h3 style="font-size:14px;margin-bottom:8px">ตารางแมทซ์ (${saved.rounds.length} ตา)</h3>
     <table>
-      <tr><th style="width:50px">ตา</th><th>ทีมเขียว 🟢</th><th style="width:40px">VS</th><th>ทีมน้ำเงิน 🔵</th><th>พัก</th></tr>
+      <tr><th>ตา</th><th>ทีมเขียว 🟢</th><th>VS</th><th>ทีมน้ำเงิน 🔵</th></tr>
       ${rows}
     </table>
     <script>window.addEventListener('load',()=>setTimeout(()=>window.print(),300))<\/script>
@@ -1635,13 +1722,11 @@ function exportMatchExcel(evId) {
   if (typeof XLSX === 'undefined') { toast('⏳ กำลังโหลด Excel library...'); return; }
   const players = getPlayers();
   const gn = id => players.find(p=>p.id===id)?.name||'?';
-  const numData = [['หมายเลข','ชื่อ'], ...saved.numAssign.map(({id,num})=>[num, gn(id)])];
   const matchData = [
-    ['ตาที่','ทีมเขียว','VS','ทีมน้ำเงิน','พัก'],
-    ...saved.rounds.map(r=>[r.round, r.t1.map(gn).join(' / '), 'VS', r.t2.map(gn).join(' / '), r.sit?.length?r.sit.map(gn).join(', '):'-'])
+    ['ตาที่','ทีมเขียว','VS','ทีมน้ำเงิน'],
+    ...saved.rounds.map(r=>[r.round, r.t1.map(gn).join(' / '), 'VS', r.t2.map(gn).join(' / ')])
   ];
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(numData), 'หมายเลข');
   XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(matchData), 'ตารางแมทซ์');
   XLSX.writeFile(wb, `match_${ev.date}.xlsx`);
   toast('ดาวน์โหลด Excel แล้ว ✓');
@@ -1672,18 +1757,43 @@ function renderMonthlyPayment() {
     const d = new Date(ev.date+'T00:00:00');
     return d >= ms && d <= me && regs.some(r=>r.eventId===ev.id && r.playerId===pid);
   });
+  // คำนวณยอดรวมประจำเดือน
+  let totalFee = 0, feeSetCount = 0;
+  myEvs.forEach(ev => {
+    const allEvRegs = regs.filter(r=>r.eventId===ev.id);
+    const fees = calcFees(ev, allEvRegs);
+    if (fees) {
+      const myReg = allEvRegs.find(r=>r.playerId===pid);
+      totalFee += myReg?.type==='walkin' ? fees.wiRate : fees.regFee;
+      feeSetCount++;
+    }
+  });
   const cont = document.getElementById('mp-content');
   cont.innerHTML = `
     <div class="hero hero-am mb4" style="border-radius:28px">
-      <div style="font-size:28px;margin-bottom:8px">💳</div>
-      <h2 style="font-size:20px;font-weight:900;margin-bottom:4px">ชำระเงินประจำเดือน</h2>
-      <p style="color:rgba(255,255,255,.75);font-size:14px">${TM[now.getMonth()]} ${now.getFullYear()+543}</p>
-      <p style="color:rgba(255,255,255,.6);font-size:13px;margin-top:4px">👤 ${S.player?.name}</p>
+      <div style="font-size:24px;margin-bottom:6px">💳</div>
+      <h2 style="font-size:18px;font-weight:900;margin-bottom:2px">ชำระเงินประจำเดือน</h2>
+      <p style="color:rgba(255,255,255,.75);font-size:13px">${TM[now.getMonth()]} ${now.getFullYear()+543} · 👤 ${S.player?.name}</p>
+      ${feeSetCount > 0 ? `
+      <div style="margin-top:14px;background:rgba(255,255,255,.15);border-radius:16px;padding:12px 16px">
+        <div style="font-size:40px;font-weight:900;color:#fff;line-height:1">${totalFee.toLocaleString()} <span style="font-size:18px;font-weight:500">฿</span></div>
+        <div style="font-size:12px;color:rgba(255,255,255,.7);margin-top:4px">
+          ยอดรวมเดือนนี้ (${feeSetCount} วัน)${feeSetCount < myEvs.length ? ' · บางวันยังไม่มีค่าคอร์ท' : ''}
+        </div>
+      </div>` : myEvs.length > 0 ? `<div style="margin-top:12px;font-size:12px;color:rgba(255,255,255,.6)">⏳ แอดมินยังไม่ได้กำหนดค่าคอร์ท</div>` : ''}
     </div>
     <div class="card mb3">
       <div class="fw7 mb2">📅 วันที่ลงทะเบียนเดือนนี้ (${myEvs.length} วัน)</div>
       ${myEvs.length
-        ? myEvs.map(ev=>`<div class="sum-row"><span class="sum-lbl">${formatDate(ev.date)}</span><span class="badge bg">จอง ✓</span></div>`).join('')
+        ? myEvs.map(ev=>{
+            const allEvRegs = regs.filter(r=>r.eventId===ev.id);
+            const fees = calcFees(ev, allEvRegs);
+            const myReg = allEvRegs.find(r=>r.playerId===pid);
+            const myFee = fees ? (myReg?.type==='walkin' ? fees.wiRate : fees.regFee) : null;
+            return `<div class="sum-row">
+              <span class="sum-lbl">${formatDate(ev.date)}</span>
+              <span class="fw7 text-g">${myFee!=null ? myFee.toLocaleString()+' ฿' : '?'}</span>
+            </div>`;}).join('')
         : '<div class="t-sm text-muted" style="padding:8px 0">ยังไม่มีวันเล่นที่จองในเดือนนี้</div>'}
     </div>
     ${myPay?.paid
@@ -1826,7 +1936,7 @@ function toggleMonthlyPaid(playerId, monthKey) {
 // ════════════════════════════════════════════════════════════
 // UTILITIES
 // ════════════════════════════════════════════════════════════
-function firstChar(name) { return name.charAt(0) || '?'; }
+function firstChar(name) { return name || '?'; }
 function formatDate(ds) {
   const d = new Date(ds+'T00:00:00');
   return `${TD[d.getDay()]}ที่ ${d.getDate()} ${TS[d.getMonth()]} ${d.getFullYear()+543}`;
