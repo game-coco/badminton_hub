@@ -100,6 +100,25 @@ select.inp{appearance:auto}
 .lr{display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid #f8fafc}
 .lr:last-child{border-bottom:none}
 .lh{padding:12px 16px;border-bottom:1px solid var(--gray-b);display:flex;justify-content:space-between;align-items:center}
+.ap-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.ap-player-card{height:86px;background:#fff;border:2px solid var(--gray-b);border-radius:var(--card-r);padding:12px;display:flex;align-items:center;box-shadow:var(--sh-sm);transition:border-color .15s,box-shadow .15s,background .15s,transform .04s;user-select:none;cursor:grab}
+.ap-player-card.ap-dragging{border-color:var(--g2);box-shadow:var(--sh-lg);opacity:.96;pointer-events:none;z-index:150;position:relative}
+.ap-player-card.ap-drop-target{border-color:#34d399;background:#ecfdf5}
+.ap-card-top{width:100%;display:grid;grid-template-columns:auto auto minmax(0,1fr) auto;align-items:center;gap:10px;touch-action:none}
+.ap-handle{color:#cbd5e1;font-size:20px;line-height:1;cursor:grab;touch-action:none;padding:5px 4px;margin:-5px -2px}
+.ap-handle:active{cursor:grabbing}
+.ap-name{font-size:16px;font-weight:700;color:#1e293b;line-height:1.25;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;word-break:break-word}
+.ap-del{background:transparent;border:none;color:#94a3b8;font-size:12px;padding:5px 8px;border-radius:8px;cursor:pointer;font-family:inherit;flex-shrink:0}
+.ap-del:hover{background:#fef2f2;color:#ef4444}
+.cm-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.cm-card{height:76px;background:#fff;border:2px solid var(--gray-b);border-radius:var(--card-r);padding:12px;display:grid;grid-template-columns:auto auto minmax(0,1fr);align-items:center;gap:10px;cursor:pointer;transition:border-color .15s,background .15s,box-shadow .15s;user-select:none}
+.cm-card:has(input:checked){border-color:#10b981;background:#ecfdf5;box-shadow:0 4px 16px rgba(4,120,87,.1)}
+.cm-card input{width:18px;height:18px;accent-color:var(--g2);cursor:pointer}
+.cm-name{font-size:15px;font-weight:700;color:#1e293b;line-height:1.25;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;word-break:break-word}
+.aed-type-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.aed-type-card{border:2px solid var(--gray-b);border-radius:14px;padding:12px;display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none}
+.aed-type-card:has(input:checked){border-color:#10b981;background:#ecfdf5}
+.aed-type-card input{width:18px;height:18px;accent-color:var(--g2)}
 
 /* ─── STAT BAR ───────────────────────────────────────────── */
 .stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
@@ -138,11 +157,14 @@ select.inp{appearance:auto}
 /* ─── PLAYER SELECT ──────────────────────────────────────── */
 .ps-hd{background:linear-gradient(135deg,var(--g1),var(--g2));padding:48px 24px 32px;text-align:center;color:#fff}
 .ps-bd{max-width:520px;margin:0 auto;padding:16px}
-.pi{background:#fff;border:2px solid var(--gray-b);border-radius:var(--card-r);padding:14px 16px;display:flex;align-items:center;gap:13px;cursor:pointer;transition:all .15s;margin-bottom:8px}
+#players-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:10px}
+#players-grid .empty{grid-column:1/-1}
+.pi{width:100%;height:86px;background:#fff;border:2px solid var(--gray-b);border-radius:var(--card-r);padding:12px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:10px;cursor:pointer;transition:all .15s;margin-bottom:0;text-align:left}
 .pi:hover{border-color:var(--g2);box-shadow:0 4px 16px rgba(4,120,87,.1)}
 .pi:active{transform:scale(.98)}
-.pi-name{font-size:17px;font-weight:700;color:#1e293b;flex:1}
+.pi-name{font-size:16px;font-weight:700;color:#1e293b;line-height:1.25;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;word-break:break-word}
 .pi-arr{color:#cbd5e1;font-size:20px}
+.player-dot{width:30px;height:30px;min-width:30px;padding:0;font-size:0;line-height:0;box-shadow:0 5px 14px rgba(5,150,105,.25)}
 .pi-add{width:100%;border:2px dashed #a7f3d0;background:transparent;color:var(--g2);border-radius:var(--card-r);padding:16px;font-size:15px;font-weight:600;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:8px;cursor:pointer;transition:background .15s}
 .pi-add:hover{background:#ecfdf5}
 
@@ -429,7 +451,9 @@ input[type=file]::file-selector-button{background:var(--g2);color:#fff;border:no
       <button class="mc" onclick="showPage('adminCosts')"><span class="mc-icon">💰</span><div class="mc-title">คิดเงิน</div><div class="mc-sub">หารค่าคอร์ท</div></button>
       <button class="mc" onclick="showPage('adminMatches')"><span class="mc-icon">🎯</span><div class="mc-title">สุ่มคู่</div><div class="mc-sub">จับคู่ผู้เล่น</div></button>
       <button class="mc" onclick="showPage('adminPlayers')"><span class="mc-icon">👥</span><div class="mc-title">ผู้เล่น</div><div class="mc-sub">จัดการรายชื่อ</div></button>
+      <button class="mc mc-full" onclick="showPage('adminCustomMatches')"><span style="font-size:32px">🎲</span><div><div class="mc-title">สุ่มเอง</div><div class="mc-sub">เลือกผู้เล่นเอง ไม่อิงวันเล่น</div></div></button>
       <button class="mc mc-full" onclick="showPage('overview')"><span style="font-size:32px">📊</span><div><div class="mc-title">ภาพรวมผู้เล่น</div><div class="mc-sub">ดูตารางทุกวัน</div></div></button>
+      <button class="mc mc-full" onclick="showPage('adminBalance')"><span style="font-size:32px">🧮</span><div><div class="mc-title">คำนวณคงเหลือ</div><div class="mc-sub">สรุปยอดรายเดือน</div></div></button>
       <button class="mc mc-full" onclick="openAdminMonthlyPay()"><span style="font-size:32px">💳</span><div><div class="mc-title">ชำระเงินประจำเดือน</div><div class="mc-sub">ยืนยันสลิปสมาชิก</div></div></button>
       <button class="mc mc-full" onclick="showChangePin()" style="padding:14px 20px"><span style="font-size:24px">🔑</span><div class="mc-title" style="font-size:14px">เปลี่ยน PIN แอดมิน</div></button>
     </div>
@@ -499,6 +523,20 @@ input[type=file]::file-selector-button{background:var(--g2);color:#fff;border:no
 </div>
 
 <!-- ╔══════════════════════════════════════════════════════╗ -->
+<!-- ║  ADMIN BALANCE CALCULATOR                            ║ -->
+<!-- ╚══════════════════════════════════════════════════════╝ -->
+<div id="page-adminBalance" class="page">
+  <div class="wrap">
+    <h2 style="font-size:20px;font-weight:800;margin-bottom:16px">🧮 คำนวณคงเหลือ</h2>
+    <div class="card mb4">
+      <label class="lbl">เลือกเดือน</label>
+      <select id="bal-sel" class="inp" onchange="renderAdminBalance()"></select>
+    </div>
+    <div id="bal-content"></div>
+  </div>
+</div>
+
+<!-- ╔══════════════════════════════════════════════════════╗ -->
 <!-- ║  ADMIN MATCHES                                       ║ -->
 <!-- ╚══════════════════════════════════════════════════════╝ -->
 <div id="page-adminMatches" class="page">
@@ -509,6 +547,16 @@ input[type=file]::file-selector-button{background:var(--g2);color:#fff;border:no
       <select id="match-sel" class="inp" onchange="loadMatch()"></select>
     </div>
     <div id="match-content"></div>
+  </div>
+</div>
+
+<!-- ╔══════════════════════════════════════════════════════╗ -->
+<!-- ║  ADMIN CUSTOM MATCHES                                ║ -->
+<!-- ╚══════════════════════════════════════════════════════╝ -->
+<div id="page-adminCustomMatches" class="page">
+  <div class="wrap">
+    <h2 style="font-size:20px;font-weight:800;margin-bottom:16px">🎲 สุ่มเอง</h2>
+    <div id="custom-match-content"></div>
   </div>
 </div>
 
@@ -703,7 +751,9 @@ function refreshCurrentPage() {
   else if (p==='adminEvents')  renderEvList();
   else if (p==='adminPlayers') renderApList();
   else if (p==='adminCosts')   initCost();
+  else if (p==='adminBalance') initAdminBalance();
   else if (p==='adminMatches') initMatch();
+  else if (p==='adminCustomMatches') renderAdminCustomMatches();
   else if (p==='overview')     renderOverview();
   else if (p==='register'        && S.curEv) openEv(S.curEv);
   else if (p==='walkin'          && S.curEv) openWI(S.curEv);
@@ -770,7 +820,9 @@ function showPage(p) {
   if (p==='adminEvents')       renderEvList();
   if (p==='adminPlayers')      renderApList();
   if (p==='adminCosts')        initCost();
+  if (p==='adminBalance')      initAdminBalance();
   if (p==='adminMatches')      initMatch();
+  if (p==='adminCustomMatches') renderAdminCustomMatches();
   if (p==='overview')          renderOverview();
   if (p==='playerMatches')     renderPlayerMatches();
   if (p==='adminEventDetail')  renderAdminEventDetail();
@@ -795,7 +847,7 @@ function renderPlayers() {
   if (!players.length) { el.innerHTML='<div class="empty"><div class="empty-ico">👤</div><p class="empty-txt">ยังไม่มีผู้เล่น<br>กดเพิ่มชื่อด้านล่าง</p></div>'; return; }
   el.innerHTML = players.map(p => `
     <button class="pi" onclick="selPlayer('${p.id}')">
-      <div class="av">${firstChar(p.name)}</div>
+      <div class="av player-dot" aria-hidden="true"></div>
       <span class="pi-name">${p.name}</span>
       <span class="pi-arr">›</span>
     </button>`).join('');
@@ -998,7 +1050,10 @@ function openWI(evId) {
           <div style="font-size:28px;margin-bottom:4px">✅</div>
           <div class="fw7 text-b">ลงทะเบียน Walk-in แล้ว!</div>
          </div>
-         <button class="btn btn-og mb3" onclick="openMonthlyPayment()">💳 ชำระเงินประจำเดือน</button>`}
+         <div class="btn-row mb3">
+           <button class="btn btn-og f1" onclick="openMonthlyPayment()">💳 ชำระเงินประจำเดือน</button>
+           <button class="btn btn-d f1" onclick="cancelWI('${evId}')">ยกเลิก Walk-in</button>
+         </div>`}
     <div class="card-lg card-p0">
       <div class="lh"><span class="fw7">Walk-in วันนี้ (${wiRegs.length})</span></div>
       ${wiRegs.length ? wiRegs.map((r,i)=>{const p=players.find(pl=>pl.id===r.playerId);return`<div class="lr"><div class="av av-sm av-bl">${firstChar(p?.name||'?')}</div><span class="fw6 f1">${p?.name||'?'}</span><span class="badge bb">Walk-in</span></div>`;}).join('')
@@ -1013,6 +1068,16 @@ function doWI(evId) {
   regs.push({id:uid(),eventId:evId,playerId:S.player.id,type:'walkin',paid:false,slipUrl:null,slipAt:null,regAt:new Date().toISOString()});
   saveRegs(regs); toast('Walk-in สำเร็จ! 🎉'); openWI(evId);
 }
+function cancelWI(evId) {
+  if (!S.player) return;
+  if (!confirm('ยืนยันยกเลิก Walk-in?')) return;
+  const before = getRegs().length;
+  const regs = getRegs().filter(r=>!(r.eventId===evId&&r.playerId===S.player.id&&r.type==='walkin'));
+  if (regs.length === before) { toast('ไม่พบรายการ Walk-in'); return; }
+  saveRegs(regs);
+  toast('ยกเลิก Walk-in แล้ว');
+  openWI(evId);
+}
 
 // ════════════════════════════════════════════════════════════
 // PAYMENT
@@ -1023,10 +1088,10 @@ function calcFees(ev, allRegs) {
   const regRegs = allRegs.filter(r=>r.type!=='walkin');
   const wiRate  = ev.wiRate || 120;
   const wiTotal = wiRegs.length * wiRate;
-  const remain  = ev.courtFee - wiTotal;
   const n       = regRegs.length;
-  const regFee  = n > 0 ? Math.ceil(remain / n) : 0;
-  return { regFee: Math.max(regFee, 0), wiRate, regCount: n, wiCount: wiRegs.length };
+  const regFee  = n > 0 ? Math.ceil(ev.courtFee / n) : 0;
+  const regTotal = regFee * n;
+  return { regFee, wiRate, regCount: n, wiCount: wiRegs.length, regTotal, wiTotal, chargeTotal: regTotal + wiTotal };
 }
 
 // ── Image compression (ลดขนาดก่อนอัปโหลด Firebase) ─────────
@@ -1099,7 +1164,7 @@ function openPay(evId) {
       <div class="card">
         <div class="fw7 mb3" style="font-size:14px">รายละเอียดการคำนวณ</div>
         <div class="sum-row"><span class="sum-lbl">ค่าคอร์ทรวม</span><span class="sum-val">${Number(ev.courtFee).toLocaleString()} ฿</span></div>
-        <div class="sum-row"><span class="sum-lbl">ผู้เล่นปกติ (${fees.regCount} คน)</span><span class="sum-val">${fees.regFee.toLocaleString()} ฿/คน</span></div>
+        <div class="sum-row"><span class="sum-lbl">ผู้เล่นปกติ (${fees.regCount} คน) หารค่าคอร์ท</span><span class="sum-val">${fees.regFee.toLocaleString()} ฿/คน</span></div>
         ${fees.wiCount?`<div class="sum-row"><span class="sum-lbl">Walk-in (${fees.wiCount} คน) rate คงที่</span><span class="sum-val">${fees.wiRate} ฿/คน</span></div>`:''}
         <div class="sum-row" style="border-top:2px solid var(--gray-b);margin-top:4px;padding-top:10px"><span class="sum-lbl">ค่าของคุณ</span><span class="sum-val g t-lg">${(myFee||0).toLocaleString()} ฿</span></div>
       </div>`;
@@ -1170,12 +1235,18 @@ function renderOverview() {
 // ADMIN EVENTS
 // ════════════════════════════════════════════════════════════
 let evFormOpen = false;
+function dtLocalValue(d) {
+  const x = d instanceof Date ? d : new Date(d);
+  if (isNaN(x)) return '';
+  const pad = n => String(n).padStart(2,'0');
+  return `${x.getFullYear()}-${pad(x.getMonth()+1)}-${pad(x.getDate())}T${pad(x.getHours())}:${pad(x.getMinutes())}`;
+}
 function toggleEvForm() {
   evFormOpen = !evFormOpen;
   document.getElementById('ev-form').classList.toggle('hidden', !evFormOpen);
   if (evFormOpen) {
     const t = new Date(); t.setDate(t.getDate()+1); t.setHours(20,0,0,0);
-    document.getElementById('ef-dl').value = t.toISOString().slice(0,16);
+    document.getElementById('ef-dl').value = dtLocalValue(t);
   }
 }
 function addEvent() {
@@ -1211,8 +1282,17 @@ function renderEvList() {
           <div class="t-xs text-muted mt1">${ev.startTime||''} – ${ev.endTime||''} ${ev.location?'· '+ev.location:''}</div>
           <div class="t-xs text-gray mt1">👥 ${cnt} คน · 🏟 ${ev.courts||1} คอร์ท${ev.courtFee?' · 💰 '+Number(ev.courtFee).toLocaleString()+' ฿':''}</div>
           <div class="t-xs text-muted mt1">🚶 Walk-in rate: ${ev.wiRate||120} ฿</div>
+          <div class="t-xs ${isOpen?'text-g':'text-r'} mt1">ปิดรับจอง: ${fmtDT(ev.deadline)}</div>
         </div>
         <span class="badge ${isOpen?'bg':'bgr'}">${isOpen?'เปิดจอง':'ปิดแล้ว'}</span>
+      </div>
+      <div class="mb3" style="background:#f8fafc;border:1px solid var(--gray-b);border-radius:14px;padding:12px">
+        <label class="lbl">ตั้งวัน/เวลาปิดรับจอง</label>
+        <div class="row" style="align-items:stretch">
+          <input type="datetime-local" id="dl-${ev.id}" value="${dtLocalValue(ev.deadline)}" class="inp f1">
+          <button class="btn btn-p btn-sm" onclick="saveDeadline('${ev.id}')" style="align-self:center">บันทึก</button>
+        </div>
+        <button class="btn btn-s btn-sm mt2" onclick="closeBookingNow('${ev.id}')" style="width:100%;margin-bottom:0">ปิดจองตอนนี้</button>
       </div>
       <div style="display:flex;flex-direction:column;gap:8px">
         <div class="btn-row">
@@ -1225,6 +1305,22 @@ function renderEvList() {
         </div>
       </div>
     </div>`;}).join('');
+}
+function saveDeadline(evId) {
+  const inp = document.getElementById('dl-'+evId);
+  const dl = inp?.value;
+  if (!dl) { toast('กรุณาเลือกวัน/เวลาปิดรับจอง'); return; }
+  const events = getEvents(), ev = events.find(e=>e.id===evId);
+  if (!ev) return;
+  ev.deadline = dl;
+  saveEvents(events);
+  renderEvList();
+  toast(new Date() <= new Date(dl) ? 'อัปเดตเวลาเปิดจองแล้ว ✓' : 'ปิดรับจองแล้ว ✓');
+}
+function closeBookingNow(evId) {
+  const inp = document.getElementById('dl-'+evId);
+  if (inp) inp.value = dtLocalValue(new Date());
+  saveDeadline(evId);
 }
 function editFee(evId) {
   const f = prompt('กรอกค่าคอร์ทรวม (บาท):\n(ระบบจะปัดขึ้น CEILING ให้อัตโนมัติ)');
@@ -1271,11 +1367,12 @@ function loadCost() {
         <input type="number" id="fee-inp" value="${ev.courtFee||''}" placeholder="เช่น 960" class="inp f1">
         <button class="btn btn-p btn-sm" onclick="saveFee('${evId}')">บันทึก</button>
       </div>
-      ${fees?`<p class="t-xs text-muted mt2">💡 ค่าคนละ = CEILING(${Number(ev.courtFee).toLocaleString()} ÷ ผู้เล่น) ปัดขึ้นเสมอ</p>`:''}
+      ${fees?`<p class="t-xs text-muted mt2">${fees.regCount ? `💡 ผู้เล่นปกติ = CEILING(${Number(ev.courtFee).toLocaleString()} ÷ ${fees.regCount} คนจอง) · Walk-in คิดแยก ${fees.wiRate} ฿/คน` : `💡 ยังไม่มีผู้เล่นจองปกติ · Walk-in คิดแยก ${fees.wiRate} ฿/คน`}</p>`:''}
     </div>
     ${fees ? `<div class="cost-grid">
       <div class="cost-box cg"><div class="cost-n text-g">${fees.regFee.toLocaleString()}</div><div class="cost-l">฿/คน ปกติ (${fees.regCount} คน)</div></div>
       <div class="cost-box cb"><div class="cost-n text-b">${fees.wiRate}</div><div class="cost-l">฿ Walk-in (${fees.wiCount} คน)</div></div>
+      <div class="cost-box ca" style="grid-column:1/-1"><div class="cost-n text-am">${fees.chargeTotal.toLocaleString()}</div><div class="cost-l">จำนวนที่เรียกเก็บรวม</div></div>
     </div>
     <div class="cost-grid">
       <div class="cost-box cg"><div class="cost-n text-g">${coll.toLocaleString()}</div><div class="cost-l">รับแล้ว ✅</div></div>
@@ -1317,20 +1414,311 @@ function viewSlip(regId) {
 }
 
 // ════════════════════════════════════════════════════════════
+// ADMIN BALANCE CALCULATOR
+// ════════════════════════════════════════════════════════════
+const BAL_STORE_KEY = 'badminton-admin-balance';
+function money(n) { return Number(n || 0).toLocaleString() + ' ฿'; }
+function getBalStore() {
+  try { return JSON.parse(localStorage.getItem(BAL_STORE_KEY) || '{}'); }
+  catch(e) { return {}; }
+}
+function getBalInputs(monthKey) {
+  return getBalStore()[monthKey] || { carry:'', paidCourt:'' };
+}
+function setBalInputs(monthKey, data) {
+  const store = getBalStore();
+  store[monthKey] = data;
+  try { localStorage.setItem(BAL_STORE_KEY, JSON.stringify(store)); } catch(e) {}
+}
+function monthLabel(monthKey) {
+  const [y, m] = monthKey.split('-').map(Number);
+  return `${TM[m-1]} ${y+543}`;
+}
+function getEventMonthKey(ev) {
+  return getMonthKey(new Date(ev.date + 'T00:00:00'));
+}
+function getBalanceMonthKeys() {
+  const keys = new Set(getEvents().filter(ev=>ev.date).map(getEventMonthKey));
+  keys.add(getMonthKey());
+  return [...keys].sort((a,b)=>b.localeCompare(a));
+}
+function initAdminBalance() {
+  const months = getBalanceMonthKeys();
+  const sel = document.getElementById('bal-sel');
+  sel.innerHTML = months.map(mk=>`<option value="${mk}">${monthLabel(mk)}</option>`).join('');
+  if (S.curBalMonth && months.includes(S.curBalMonth)) sel.value = S.curBalMonth;
+  if (months.length) renderAdminBalance();
+  else document.getElementById('bal-content').innerHTML='<div class="empty"><div class="empty-ico">🧮</div><p class="empty-txt">ยังไม่มีเดือนให้คำนวณ</p></div>';
+}
+function getMonthlyBalanceSummary(monthKey) {
+  const regs = getRegs();
+  const events = getEvents()
+    .filter(ev => ev.date && getEventMonthKey(ev) === monthKey)
+    .sort((a,b)=>new Date(a.date)-new Date(b.date));
+  return events.reduce((sum, ev) => {
+    const evRegs = regs.filter(r=>r.eventId===ev.id);
+    const fees = calcFees(ev, evRegs);
+    if (!fees) {
+      sum.missingFee.push(ev);
+      sum.rows.push({ ev, fees:null, regs:evRegs.length });
+      return sum;
+    }
+    sum.charge += fees.chargeTotal;
+    sum.regTotal += fees.regTotal;
+    sum.wiTotal += fees.wiTotal;
+    sum.regCount += fees.regCount;
+    sum.wiCount += fees.wiCount;
+    sum.rows.push({ ev, fees, regs:evRegs.length });
+    return sum;
+  }, { events, rows:[], missingFee:[], charge:0, regTotal:0, wiTotal:0, regCount:0, wiCount:0 });
+}
+function renderAdminBalance() {
+  const monthKey = document.getElementById('bal-sel')?.value;
+  if (!monthKey) return;
+  S.curBalMonth = monthKey;
+  const summary = getMonthlyBalanceSummary(monthKey);
+  const saved = getBalInputs(monthKey);
+  const charge = summary.charge;
+  document.getElementById('bal-content').innerHTML = `
+    ${summary.missingFee.length ? `<div class="card mb3" style="border-color:#fde68a;background:#fffbeb">
+      <div class="fw7 text-am mb1">บางวันยังไม่มีค่าคอร์ท</div>
+      <p class="t-sm text-muted">วันที่ยังไม่ถูกรวมในยอด: ${summary.missingFee.map(ev=>formatDate(ev.date)).join(', ')}</p>
+    </div>` : ''}
+    <div class="card-lg mb3">
+      <div class="fw7 mb3" style="font-size:14px">${monthLabel(monthKey)}</div>
+      <div class="sum-row" style="align-items:flex-start;gap:12px">
+        <span class="sum-lbl" style="padding-top:12px">ยกมา</span>
+        <input id="bal-carry" class="inp" type="number" value="${saved.carry || ''}" placeholder="0" oninput="saveAdminBalanceInputs('${monthKey}')" style="max-width:190px;text-align:right">
+      </div>
+      <div class="sum-row">
+        <span class="sum-lbl">จำนวนที่เรียกเก็บ</span>
+        <span id="bal-charge" class="sum-val g" data-value="${charge}">${money(charge)}</span>
+      </div>
+      <div class="sum-row" style="align-items:flex-start;gap:12px">
+        <span class="sum-lbl" style="padding-top:12px">จำนวนเงินที่จ่ายคอร์ท</span>
+        <input id="bal-paid-court" class="inp" type="number" value="${saved.paidCourt || ''}" placeholder="0" oninput="saveAdminBalanceInputs('${monthKey}')" style="max-width:190px;text-align:right">
+      </div>
+      <div class="sum-row" style="border-top:2px solid var(--gray-b);margin-top:6px;padding-top:14px">
+        <span class="sum-lbl fw7">คงเหลือ</span>
+        <span id="bal-remaining" class="sum-val t-xl text-g">0 ฿</span>
+      </div>
+      <p id="bal-formula" class="t-xs text-muted mt2"></p>
+    </div>
+    <div class="card">
+      <div class="fw7 mb3" style="font-size:14px">รายละเอียดจำนวนที่เรียกเก็บ</div>
+      <div class="sum-row"><span class="sum-lbl">ผู้เล่นจองรวม (${summary.regCount} รายการ)</span><span class="sum-val">${money(summary.regTotal)}</span></div>
+      <div class="sum-row"><span class="sum-lbl">Walk-in รวม (${summary.wiCount} รายการ)</span><span class="sum-val">${money(summary.wiTotal)}</span></div>
+      <div class="sum-row"><span class="sum-lbl">รวมเรียกเก็บ</span><span class="sum-val g">${money(charge)}</span></div>
+    </div>
+    <div class="card-lg card-p0">
+      <div class="lh"><span class="fw7">แยกตามวันเล่น</span><span class="t-sm text-muted">${summary.rows.length} วัน</span></div>
+      ${summary.rows.length ? summary.rows.map(({ev, fees, regs}) => `
+        <div class="lr" style="align-items:flex-start">
+          <div class="f1">
+            <div class="fw7 t-sm">${formatDate(ev.date)}</div>
+            <div class="t-xs text-muted">${regs} คน · ${ev.courtFee ? Number(ev.courtFee).toLocaleString() + ' ฿' : 'ยังไม่มีค่าคอร์ท'}</div>
+          </div>
+          <div class="tr">
+            <div class="fw7 ${fees?'text-g':'text-muted'}">${fees ? money(fees.chargeTotal) : '-'}</div>
+            ${fees ? `<div class="t-xs text-muted">จอง ${money(fees.regTotal)} · WI ${money(fees.wiTotal)}</div>` : ''}
+          </div>
+        </div>`).join('')
+        : '<div class="empty-txt tc" style="padding:24px">เดือนนี้ยังไม่มีวันเล่น</div>'}
+    </div>`;
+  updateAdminBalanceTotals();
+}
+function saveAdminBalanceInputs(monthKey) {
+  setBalInputs(monthKey, {
+    carry: document.getElementById('bal-carry')?.value || '',
+    paidCourt: document.getElementById('bal-paid-court')?.value || ''
+  });
+  updateAdminBalanceTotals();
+}
+function updateAdminBalanceTotals() {
+  const carry = Number(document.getElementById('bal-carry')?.value || 0);
+  const charge = Number(document.getElementById('bal-charge')?.dataset.value || 0);
+  const paidCourt = Number(document.getElementById('bal-paid-court')?.value || 0);
+  const remaining = carry + charge - paidCourt;
+  const out = document.getElementById('bal-remaining');
+  if (out) {
+    out.textContent = money(remaining);
+    out.classList.toggle('text-r', remaining < 0);
+    out.classList.toggle('text-g', remaining >= 0);
+  }
+  const formula = document.getElementById('bal-formula');
+  if (formula) formula.textContent = `${money(carry)} + ${money(charge)} - ${money(paidCourt)} = ${money(remaining)}`;
+}
+
+// ════════════════════════════════════════════════════════════
 // ADMIN MATCHES
 // ════════════════════════════════════════════════════════════
-function getSchedule(n) {
-  const key = Math.min(Math.max(n, 5), 12);
-  return MS[key] || MS[5];
+function fairPairKey(a,b) {
+  return [a,b].sort().join('|');
 }
-function buildRound(schedule, roundIdx, n, shuffled) {
-  const s = schedule[roundIdx % schedule.length];
-  const t1 = s[0].map(slot => shuffled[slot-1]).filter(Boolean);
-  const t2 = s[1].map(slot => shuffled[slot-1]).filter(Boolean);
-  const all = shuffled.slice(0, n);
-  const playing = [...t1, ...t2];
-  const sit = all.filter(id => !playing.includes(id));
-  return { round: roundIdx+1, t1, t2, sit };
+function incCount(obj, key) {
+  obj[key] = (obj[key] || 0) + 1;
+}
+function getCount(obj, key) {
+  return obj[key] || 0;
+}
+function fairOpponentPairs(team1, team2) {
+  const out = new Set();
+  team1.forEach(a => team2.forEach(b => out.add(fairPairKey(a,b))));
+  return out;
+}
+function fairTeamings(selected) {
+  const [a,b,c,d] = selected;
+  return [
+    [[a,b],[c,d]],
+    [[a,c],[b,d]],
+    [[a,d],[b,c]],
+  ];
+}
+function fairCombinations4(arr) {
+  const out = [];
+  for (let a=0; a<arr.length-3; a++)
+    for (let b=a+1; b<arr.length-2; b++)
+      for (let c=b+1; c<arr.length-1; c++)
+        for (let d=c+1; d<arr.length; d++)
+          out.push([arr[a], arr[b], arr[c], arr[d]]);
+  return out;
+}
+function fairShuffle(arr) {
+  const out = [...arr];
+  for (let i=out.length-1; i>0; i--) {
+    const j = Math.floor(Math.random() * (i+1));
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
+}
+function fairCandidatePool(available, state, limit=16) {
+  if (available.length <= limit) return available;
+  return [...available].sort((a,b) => {
+    const totalDiff = (state.totalCount[a] || 0) - (state.totalCount[b] || 0);
+    if (totalDiff) return totalDiff;
+    const benchDiff = (state.benchStreak[b] || 0) - (state.benchStreak[a] || 0);
+    if (benchDiff) return benchDiff;
+    const streakDiff = (state.playStreak[a] || 0) - (state.playStreak[b] || 0);
+    if (streakDiff) return streakDiff;
+    return Math.random() - .5;
+  }).slice(0, limit);
+}
+function fairScoreCandidate(players, selected, team1, team2, state) {
+  const active = new Set(selected);
+  let minTotal = Infinity, maxTotal = -Infinity;
+  players.forEach(p => {
+    const t = (state.totalCount[p] || 0) + (active.has(p) ? 1 : 0);
+    if (t < minTotal) minTotal = t;
+    if (t > maxTotal) maxTotal = t;
+  });
+  let score = (maxTotal - minTotal) * 1000000;
+
+  // Prefer players who have played less so far.
+  score += selected.reduce((sum,p)=>sum + (state.totalCount[p] || 0), 0) * 5000;
+
+  players.forEach(p => {
+    if (active.has(p)) {
+      const nextPlayStreak = (state.playStreak[p] || 0) + 1;
+      if (players.length > 4 && nextPlayStreak > 2) score += (nextPlayStreak - 2) * 250000;
+    } else {
+      const nextBenchStreak = (state.benchStreak[p] || 0) + 1;
+      score += nextBenchStreak * nextBenchStreak * 15000;
+      if ((state.totalCount[p] || 0) <= minTotal) score += 20000;
+    }
+  });
+
+  const pairs = new Set([
+    fairPairKey(team1[0], team1[1]),
+    fairPairKey(team2[0], team2[1]),
+  ]);
+  pairs.forEach(pk => {
+    if (state.lastPairs.has(pk)) score += 1000000;
+    const c = getCount(state.partnerCount, pk);
+    score += c * 5000 + c * c * 500;
+  });
+
+  const opponents = fairOpponentPairs(team1, team2);
+  opponents.forEach(ok => {
+    if (state.lastOpponents.has(ok)) score += 20000;
+    const c = getCount(state.opponentCount, ok);
+    score += c * 800 + c * c * 100;
+  });
+
+  return score;
+}
+function chooseFairMatch(players, state) {
+  const pool = fairCandidatePool(players, state);
+
+  let best = [], bestScore = Infinity;
+  for (let a=0; a<pool.length-3; a++) {
+    for (let b=a+1; b<pool.length-2; b++) {
+      for (let c=b+1; c<pool.length-1; c++) {
+        for (let d=c+1; d<pool.length; d++) {
+          const selected = [pool[a], pool[b], pool[c], pool[d]];
+          fairTeamings(selected).forEach(([team1, team2]) => {
+            const score = fairScoreCandidate(players, selected, team1, team2, state);
+            if (score < bestScore) { bestScore = score; best = [{team1, team2}]; }
+            else if (score === bestScore) best.push({team1, team2});
+          });
+        }
+      }
+    }
+  }
+
+  if (!best.length) throw new Error('ไม่สามารถสร้างคู่ได้');
+  return best[Math.floor(Math.random() * best.length)];
+}
+function generateFairSchedule(playerIds, numMatches=30) {
+  const players = fairShuffle([...new Set(playerIds)]);
+  if (players.length < 4) throw new Error('ต้องมีผู้เล่นอย่างน้อย 4 คน');
+
+  const state = {
+    totalCount:{}, playStreak:{}, benchStreak:{},
+    partnerCount:{}, opponentCount:{},
+    lastPairs:new Set(), lastOpponents:new Set(),
+  };
+  players.forEach(p => {
+    state.totalCount[p] = 0;
+    state.playStreak[p] = 0;
+    state.benchStreak[p] = 0;
+  });
+
+  const rounds = [];
+  for (let i=0; i<numMatches; i++) {
+    const {team1, team2} = chooseFairMatch(players, state);
+    const active = new Set([...team1, ...team2]);
+    const sit = players.filter(p => !active.has(p));
+
+    players.forEach(p => {
+      if (active.has(p)) {
+        state.totalCount[p]++;
+        state.playStreak[p]++;
+        state.benchStreak[p] = 0;
+      } else {
+        state.playStreak[p] = 0;
+        state.benchStreak[p]++;
+      }
+    });
+
+    const currentPairs = new Set([
+      fairPairKey(team1[0], team1[1]),
+      fairPairKey(team2[0], team2[1]),
+    ]);
+    currentPairs.forEach(pk => incCount(state.partnerCount, pk));
+
+    const currentOpponents = fairOpponentPairs(team1, team2);
+    currentOpponents.forEach(ok => incCount(state.opponentCount, ok));
+
+    rounds.push({ round:i+1, t1:team1, t2:team2, sit });
+    state.lastPairs = currentPairs;
+    state.lastOpponents = currentOpponents;
+  }
+
+  return {
+    rounds,
+    numAssign: players.map((id,i)=>({id,num:i+1})),
+    totalCount: state.totalCount,
+  };
 }
 function initMatch() {
   const events = getEvents().sort((a,b)=>new Date(b.date)-new Date(a.date));
@@ -1342,6 +1730,7 @@ function initMatch() {
 }
 function loadMatch() {
   const evId = document.getElementById('match-sel').value;
+  S.curEv = evId;
   const regs = getRegs().filter(r=>r.eventId===evId);
   const players = getPlayers();
   const saved = getMatches()[evId];
@@ -1352,8 +1741,8 @@ function loadMatch() {
       <div class="fw7 mb1">ผู้เล่นวันนี้: <span class="text-g">${n} คน</span></div>
       <div class="t-sm text-muted">${regs.map(r=>{ const p=players.find(pl=>pl.id===r.playerId); return `<span style="display:inline-block;background:var(--gray-l);border-radius:8px;padding:2px 8px;margin:2px;font-size:12px">${p?.name||'?'}</span>`; }).join('')}</div>
     </div>
-    ${n < 5
-      ? `<div class="empty"><div class="empty-ico">⚠️</div><p class="empty-txt">ต้องการผู้เล่นอย่างน้อย 5 คน<br>(ตอนนี้มี ${n} คน)</p></div>`
+    ${n < 4
+      ? `<div class="empty"><div class="empty-ico">⚠️</div><p class="empty-txt">ต้องการผู้เล่นอย่างน้อย 4 คน<br>(ตอนนี้มี ${n} คน)</p></div>`
       : `<button class="btn btn-p mb4" onclick="doRandomize('${evId}')">🎲 ${saved?'สุ่มใหม่':'สุ่มผู้เล่น'}</button>
          ${saved
            ? `<div class="btn-row mb3">
@@ -1363,20 +1752,17 @@ function loadMatch() {
            : '<div class="empty-txt tc">กดสุ่มเพื่อจับคู่</div>'}`}`;
 }
 function doRandomize(evId) {
+  S.curEv = evId;
   const regs = getRegs().filter(r=>r.eventId===evId);
-  const n = regs.length; if(n<5){toast('ต้องการผู้เล่นอย่างน้อย 5 คน');return;}
-  const shuffled = [...regs.map(r=>r.playerId)].sort(()=>Math.random()-.5);
-  const sched = getSchedule(Math.min(n,12));
-  const rounds = [];
-  for (let i = 0; i < 30; i++) rounds.push(buildRound(sched, i, n, shuffled));
-  const numAssign = shuffled.slice(0,n).map((id,i)=>({id,num:i+1}));
-  const m = getMatches(); m[evId] = {rounds, numAssign, at:new Date().toISOString()};
+  const n = regs.length; if(n<4){toast('ต้องการผู้เล่นอย่างน้อย 4 คน');return;}
+  const schedule = generateFairSchedule(regs.map(r=>r.playerId), 30);
+  const m = getMatches(); m[evId] = {...schedule, at:new Date().toISOString(), algorithm:'fair-v2'};
   saveMatches(m); loadMatch(); toast('สุ่ม 30 ตาแล้ว! 🎉');
 }
 function renderMatchHTML(saved, gn) {
   return `
     <div class="card-lg mb4">
-      <div class="fw7 mb3">🎲 หมายเลขที่จับได้</div>
+      <div class="fw7 mb3">🎲 ลำดับผู้เล่นที่ใช้สุ่ม</div>
       <div class="num-grid">
         ${saved.numAssign.map(({id,num})=>`
           <div class="num-item">
@@ -1418,30 +1804,83 @@ function adminAddPlayer() {
   apOpen=false; document.getElementById('ap-form').classList.add('hidden');
   renderApList(); toast('เพิ่ม '+name+' แล้ว ✓');
 }
-let _apDragIdx = null;
+let _apDrag = null;
 function renderApList() {
   const players = getPlayers();
   const cont = document.getElementById('ap-list');
   if (!players.length) { cont.innerHTML='<div class="empty"><div class="empty-ico">👥</div><p class="empty-txt">ยังไม่มีผู้เล่น</p></div>'; return; }
   cont.innerHTML = `
     <p class="t-xs text-muted mb2" style="padding:0 2px">⠿ ลากเพื่อเรียงลำดับ</p>
-    <div class="card-lg card-p0">${players.map((p,i)=>`
-    <div class="lr ap-drag-row" draggable="true" data-i="${i}"
-      ondragstart="apDS(event,${i})" ondragover="apDO(event,${i})" ondrop="apDP(event,${i})" ondragend="apDE()"
-      style="cursor:grab;transition:background .1s">
-      <span style="color:#cbd5e1;font-size:20px;user-select:none;padding:0 4px 0 0;cursor:grab">⠿</span>
-      <div class="av">${firstChar(p.name)}</div>
-      <span class="fw7 f1">${p.name}</span>
-      <button onclick="event.stopPropagation();delPlayer('${p.id}')"
-        style="background:transparent;border:none;color:#94a3b8;font-size:13px;padding:6px 10px;border-radius:8px;cursor:pointer"
-        onmouseover="this.style.background='#fef2f2';this.style.color='#ef4444'"
-        onmouseout="this.style.background='transparent';this.style.color='#94a3b8'">ลบ</button>
-    </div>`).join('')}</div>`;
+    <div class="ap-grid">${players.map((p,i)=>`
+      <div class="ap-player-card" data-i="${i}" onpointerdown="apPD(event,${i})">
+        <div class="ap-card-top">
+          <span class="ap-handle" title="ลากเพื่อเรียงลำดับ">⠿</span>
+          <div class="av player-dot" aria-hidden="true"></div>
+          <div class="ap-name">${p.name}</div>
+          <button class="ap-del" onclick="event.stopPropagation();delPlayer('${p.id}')">ลบ</button>
+        </div>
+      </div>`).join('')}</div>`;
 }
-function apDS(e,i){ _apDragIdx=i; e.dataTransfer.effectAllowed='move'; setTimeout(()=>e.target.closest('.ap-drag-row').style.opacity='.4',0); }
-function apDO(e,i){ e.preventDefault(); document.querySelectorAll('.ap-drag-row').forEach(el=>el.style.background=''); e.currentTarget.style.background='#ecfdf5'; }
-function apDE(){ document.querySelectorAll('.ap-drag-row').forEach(el=>{el.style.opacity='1';el.style.background='';}); }
-function apDP(e,i){ e.preventDefault(); if(_apDragIdx===null||_apDragIdx===i){_apDragIdx=null;return;} const pl=getPlayers(); const[m]=pl.splice(_apDragIdx,1); pl.splice(i,0,m); _apDragIdx=null; savePlayers(pl); }
+function apPD(e,i){
+  if (e.button !== undefined && e.button !== 0) return;
+  if (e.target.closest('.ap-del')) return;
+  if (e.pointerType === 'touch' && !e.target.closest('.ap-card-top')) return;
+  const card = e.currentTarget;
+  _apDrag = { idx:i, pointerId:e.pointerId, startX:e.clientX, startY:e.clientY, card, active:false, target:null };
+  card.setPointerCapture?.(e.pointerId);
+  card.addEventListener('pointermove', apPM);
+  card.addEventListener('pointerup', apPU);
+  card.addEventListener('pointercancel', apPC);
+  e.preventDefault();
+}
+function apPM(e){
+  if (!_apDrag || e.pointerId !== _apDrag.pointerId) return;
+  const dx = e.clientX - _apDrag.startX;
+  const dy = e.clientY - _apDrag.startY;
+  if (!_apDrag.active) {
+    if (Math.hypot(dx, dy) < 5) return;
+    _apDrag.active = true;
+    _apDrag.card.classList.add('ap-dragging');
+  }
+  _apDrag.card.style.transform = `translate(${dx}px, ${dy}px) scale(1.03)`;
+  document.querySelectorAll('.ap-player-card.ap-drop-target').forEach(el => el.classList.remove('ap-drop-target'));
+  const target = apDropTargetAt(e.clientX, e.clientY);
+  _apDrag.target = target && target !== _apDrag.card ? target : null;
+  if (_apDrag.target) _apDrag.target.classList.add('ap-drop-target');
+  e.preventDefault();
+}
+function apPU(e){
+  if (!_apDrag || e.pointerId !== _apDrag.pointerId) return;
+  const from = _apDrag.idx;
+  const drop = _apDrag.target || apDropTargetAt(e.clientX, e.clientY);
+  const to = drop ? Number(drop.dataset.i) : from;
+  const moved = _apDrag.active && Number.isInteger(to) && to !== from;
+  apCleanDrag();
+  if (moved) {
+    const pl = getPlayers();
+    const [movedPlayer] = pl.splice(from, 1);
+    pl.splice(to, 0, movedPlayer);
+    savePlayers(pl);
+    renderApList();
+    toast('เรียงลำดับแล้ว ✓');
+  }
+}
+function apPC(){ apCleanDrag(); }
+function apDropTargetAt(x,y){
+  return document.elementFromPoint(x,y)?.closest?.('.ap-player-card') || null;
+}
+function apCleanDrag(){
+  if (!_apDrag) return;
+  const { card, pointerId } = _apDrag;
+  card.releasePointerCapture?.(pointerId);
+  card.removeEventListener('pointermove', apPM);
+  card.removeEventListener('pointerup', apPU);
+  card.removeEventListener('pointercancel', apPC);
+  card.style.transform = '';
+  card.classList.remove('ap-dragging');
+  document.querySelectorAll('.ap-player-card.ap-drop-target').forEach(el => el.classList.remove('ap-drop-target'));
+  _apDrag = null;
+}
 function delPlayer(id) {
   if(!confirm('ลบผู้เล่นนี้?')) return;
   savePlayers(getPlayers().filter(p=>p.id!==id)); renderApList(); toast('ลบแล้ว');
@@ -1463,6 +1902,7 @@ function renderPlayerMatches() {
 function renderPlayerMatchContent() {
   const evId = document.getElementById('pm-sel')?.value;
   if (!evId) return;
+  S.curEv = evId;
   const regs = getRegs().filter(r=>r.eventId===evId);
   const players = getPlayers();
   const saved = getMatches()[evId];
@@ -1473,8 +1913,8 @@ function renderPlayerMatchContent() {
       <div class="fw7 mb1">ผู้เล่นวันนี้: <span class="text-g">${n} คน</span></div>
       <div class="t-sm text-muted">${regs.map(r=>{const p=players.find(pl=>pl.id===r.playerId);return`<span style="display:inline-block;background:var(--gray-l);border-radius:8px;padding:2px 8px;margin:2px;font-size:12px">${p?.name||'?'}</span>`;}).join('')}</div>
     </div>
-    ${n < 5
-      ? `<div class="empty"><div class="empty-ico">⚠️</div><p class="empty-txt">ต้องการผู้เล่นอย่างน้อย 5 คน<br>(ตอนนี้มี ${n} คน)</p></div>`
+    ${n < 4
+      ? `<div class="empty"><div class="empty-ico">⚠️</div><p class="empty-txt">ต้องการผู้เล่นอย่างน้อย 4 คน<br>(ตอนนี้มี ${n} คน)</p></div>`
       : `<button class="btn btn-p mb3" onclick="doPlayerRandomize('${evId}')">🎲 ${saved?'สุ่มใหม่':'สุ่มผู้เล่น'}</button>
          ${saved
            ? `<div class="btn-row mb4">
@@ -1484,14 +1924,11 @@ function renderPlayerMatchContent() {
            : '<div class="empty-txt tc">กดสุ่มเพื่อจับคู่</div>'}`}`;
 }
 function doPlayerRandomize(evId) {
+  S.curEv = evId;
   const regs = getRegs().filter(r=>r.eventId===evId);
-  const n = regs.length; if(n<5){toast('ต้องการผู้เล่นอย่างน้อย 5 คน');return;}
-  const shuffled = [...regs.map(r=>r.playerId)].sort(()=>Math.random()-.5);
-  const sched = getSchedule(Math.min(n,12));
-  const rounds = [];
-  for (let i=0;i<30;i++) rounds.push(buildRound(sched,i,n,shuffled));
-  const numAssign = shuffled.slice(0,n).map((id,i)=>({id,num:i+1}));
-  const m = getMatches(); m[evId]={rounds,numAssign,at:new Date().toISOString()};
+  const n = regs.length; if(n<4){toast('ต้องการผู้เล่นอย่างน้อย 4 คน');return;}
+  const schedule = generateFairSchedule(regs.map(r=>r.playerId), 30);
+  const m = getMatches(); m[evId]={...schedule,at:new Date().toISOString(),algorithm:'fair-v2'};
   saveMatches(m); renderPlayerMatchContent(); toast('สุ่ม 30 ตาแล้ว! 🎉');
 }
 function renderSimpleMatchHTML(saved, gn) {
@@ -1508,6 +1945,78 @@ function renderSimpleMatchHTML(saved, gn) {
           </div>
         </div>
       </div>`).join('')}`;
+}
+
+// ════════════════════════════════════════════════════════════
+// ADMIN CUSTOM MATCHES — เลือกผู้เล่นเอง ไม่อิงวันเล่น
+// ════════════════════════════════════════════════════════════
+function getCustomSelected() {
+  const valid = new Set(getPlayers().map(p=>p.id));
+  S.customMatchSelected = (S.customMatchSelected || []).filter(id=>valid.has(id));
+  return S.customMatchSelected;
+}
+function renderAdminCustomMatches() {
+  const players = getPlayers();
+  const selected = getCustomSelected();
+  const selectedSet = new Set(selected);
+  const cont = document.getElementById('custom-match-content');
+  if (!cont) return;
+  if (!players.length) {
+    cont.innerHTML = '<div class="empty"><div class="empty-ico">👥</div><p class="empty-txt">ยังไม่มีผู้เล่น</p></div>';
+    return;
+  }
+  const gn = id => players.find(p=>p.id===id)?.name || '?';
+  cont.innerHTML = `
+    <div class="card mb3">
+      <div class="row-b mb3">
+        <div>
+          <div class="fw7">เลือกผู้เล่นที่จะสุ่ม</div>
+          <div class="t-xs text-muted mt1">เลือกแล้ว ${selected.length} คน · ต้องมีอย่างน้อย 4 คน</div>
+        </div>
+        <span class="badge ${selected.length>=4?'bg':'bgr'}">${selected.length} คน</span>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-s btn-sm" onclick="customSelectAll()">เลือกทั้งหมด</button>
+        <button class="btn btn-s btn-sm" onclick="customClearSelection()">ล้าง</button>
+      </div>
+    </div>
+    <div class="cm-grid mb3">
+      ${players.map(p=>`
+        <label class="cm-card">
+          <input type="checkbox" value="${p.id}" ${selectedSet.has(p.id)?'checked':''} onchange="customTogglePlayer('${p.id}', this.checked)">
+          <div class="av player-dot" aria-hidden="true"></div>
+          <div class="cm-name">${p.name}</div>
+        </label>`).join('')}
+    </div>
+    <button class="btn btn-p mb4" onclick="doCustomRandomize()" ${selected.length<4?'disabled style="opacity:.45"':''}>🎲 สุ่มผู้เล่นที่เลือก</button>
+    <div id="custom-match-result">
+      ${S.customMatch ? renderMatchHTML(S.customMatch, gn) : '<div class="empty-txt tc">เลือกผู้เล่นแล้วกดสุ่ม</div>'}
+    </div>`;
+}
+function customTogglePlayer(playerId, checked) {
+  const set = new Set(getCustomSelected());
+  if (checked) set.add(playerId);
+  else set.delete(playerId);
+  S.customMatchSelected = [...set];
+  if (S.customMatch && !checked) S.customMatch = null;
+  renderAdminCustomMatches();
+}
+function customSelectAll() {
+  S.customMatchSelected = getPlayers().map(p=>p.id);
+  S.customMatch = null;
+  renderAdminCustomMatches();
+}
+function customClearSelection() {
+  S.customMatchSelected = [];
+  S.customMatch = null;
+  renderAdminCustomMatches();
+}
+function doCustomRandomize() {
+  const ids = getCustomSelected();
+  if (ids.length < 4) { toast('ต้องเลือกผู้เล่นอย่างน้อย 4 คน'); return; }
+  S.customMatch = {...generateFairSchedule(ids, 30), at:new Date().toISOString(), algorithm:'fair-v2-custom'};
+  renderAdminCustomMatches();
+  toast('สุ่ม 30 ตาแล้ว ✓');
 }
 
 // ════════════════════════════════════════════════════════════
@@ -1566,6 +2075,16 @@ function renderAdminEventDetail() {
           style="background:none;border:none;color:var(--g2);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;padding:4px 8px">
           เลือกทั้งหมด
         </button>
+      </div>
+      <div class="aed-type-grid">
+        <label class="aed-type-card">
+          <input type="radio" name="aed-add-type" value="regular" checked>
+          <div><div class="fw7 t-sm">จองปกติ</div><div class="t-xs text-muted">คิดค่าคอร์ทแบบหาร</div></div>
+        </label>
+        <label class="aed-type-card">
+          <input type="radio" name="aed-add-type" value="walkin">
+          <div><div class="fw7 t-sm text-b">Walk-in</div><div class="t-xs text-muted">${ev.wiRate||120} ฿/คน</div></div>
+        </label>
       </div>
       <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px">
         ${unregPlayers.map(p=>`
@@ -1643,16 +2162,18 @@ function aedToggleAll(mode) {
 function adminAddSelected(evId) {
   const selected = [...document.querySelectorAll('.aed-add-cb:checked')].map(c => c.value);
   if (!selected.length) return;
+  const addType = document.querySelector('input[name="aed-add-type"]:checked')?.value || 'regular';
   const players = getPlayers();
   const names = selected.map(id => players.find(p=>p.id===id)?.name).filter(Boolean).join(', ');
-  confirmWithPin(`เพิ่ม ${selected.length} คน\n(${names})\nเข้าวันเล่นนี้?`, () => {
+  const typeLabel = addType === 'walkin' ? 'Walk-in' : 'จองปกติ';
+  confirmWithPin(`เพิ่ม ${selected.length} คนแบบ${typeLabel}\n(${names})\nเข้าวันเล่นนี้?`, () => {
     const regs = getRegs();
     selected.forEach(playerId => {
-      regs.push({id:uid(),eventId:evId,playerId,type:'regular',paid:false,slipUrl:null,slipAt:null,regAt:new Date().toISOString(),addedByAdmin:true});
+      regs.push({id:uid(),eventId:evId,playerId,type:addType,paid:false,slipUrl:null,slipAt:null,regAt:new Date().toISOString(),addedByAdmin:true});
     });
     saveRegs(regs);
     renderAdminEventDetail();
-    toast(`เพิ่ม ${selected.length} คนแล้ว ✓`);
+    toast(`เพิ่ม ${selected.length} คนแบบ${typeLabel}แล้ว ✓`);
   });
 }
 function adminRemoveSelected(evId) {
@@ -1743,6 +2264,26 @@ function getMonthKey(d) {
 function openMonthlyPayment() {
   if (!S.player) { toast('กรุณาเลือกชื่อก่อน'); return; }
   showPage('monthlyPayment');
+}
+function getPlayerMonthFee(playerId, monthKey) {
+  const [y, m] = monthKey.split('-').map(Number);
+  const regs = getRegs(), events = getEvents();
+  const ms = new Date(y, m-1, 1), me = new Date(y, m, 0);
+  const myEvs = events.filter(ev => {
+    const d = new Date(ev.date+'T00:00:00');
+    return d >= ms && d <= me && regs.some(r=>r.eventId===ev.id && r.playerId===playerId);
+  });
+  let total = 0, feeSetCount = 0;
+  myEvs.forEach(ev => {
+    const allEvRegs = regs.filter(r=>r.eventId===ev.id);
+    const fees = calcFees(ev, allEvRegs);
+    if (fees) {
+      const myReg = allEvRegs.find(r=>r.playerId===playerId);
+      total += myReg?.type==='walkin' ? fees.wiRate : fees.regFee;
+      feeSetCount++;
+    }
+  });
+  return { total, eventCount: myEvs.length, feeSetCount, missingCount: myEvs.length - feeSetCount };
 }
 function renderMonthlyPayment() {
   const pid = S.player?.id; if (!pid) return;
@@ -1841,7 +2382,8 @@ async function submitMonthlySlip(playerId, monthKey) {
   toast('⏳ กำลังอัปโหลดสลิป...');
   try {
     const img = await compressImage(inp.files[0]);
-    const data = { slipUrl: img, slipAt: new Date().toISOString(), paid: false, paidAt: null };
+    const feeInfo = getPlayerMonthFee(playerId, monthKey);
+    const data = { slipUrl: img, slipAt: new Date().toISOString(), amountDue: feeInfo.total, paid: false, paidAt: null };
     CACHE.monthlyPay[playerId] = CACHE.monthlyPay[playerId] || {};
     CACHE.monthlyPay[playerId][monthKey] = data;
     fRef(`/monthlyPay/${playerId}/${monthKey}`).set(data);
@@ -1863,10 +2405,6 @@ function renderAdminMonthlyPay() {
   const mp = getMonthlyPay();
   const now = new Date();
   const mk = getMonthKey(now);
-  const regs = getRegs(), events = getEvents();
-  const ms = new Date(now.getFullYear(), now.getMonth(), 1);
-  const me = new Date(now.getFullYear(), now.getMonth()+1, 0);
-  const monthEvs = events.filter(ev => { const d=new Date(ev.date+'T00:00:00'); return d>=ms&&d<=me; });
   const confirmedCount = players.filter(p => mp[p.id]?.[mk]?.paid).length;
   const cont = document.getElementById('amp-content');
   cont.innerHTML = `
@@ -1886,12 +2424,16 @@ function renderAdminMonthlyPay() {
       <div class="lh"><span class="fw7">รายชื่อสมาชิก</span></div>
       ${players.map(p => {
         const pay = mp[p.id]?.[mk];
-        const cnt = monthEvs.filter(ev=>regs.some(r=>r.eventId===ev.id&&r.playerId===p.id)).length;
+        const feeInfo = getPlayerMonthFee(p.id, mk);
+        const cnt = feeInfo.eventCount;
         return `<div class="lr" style="flex-wrap:wrap;gap:6px">
           <div class="av">${firstChar(p.name)}</div>
           <div class="f1">
             <div class="fw7">${p.name}</div>
             <div class="t-xs text-muted">เล่น ${cnt} วันในเดือนนี้</div>
+            <div class="t-xs text-g mt1">ยอดที่ควรจ่าย: ${feeInfo.feeSetCount ? feeInfo.total.toLocaleString()+' ฿' : '-'}</div>
+            ${feeInfo.missingCount ? `<div class="t-xs text-am mt1">ยังมี ${feeInfo.missingCount} วันที่ยังไม่มีค่าคอร์ท</div>` : ''}
+            ${pay?.amountDue!=null?`<div class="t-xs text-muted mt1">ยอดตอนส่งสลิป: ${Number(pay.amountDue).toLocaleString()} ฿</div>`:''}
             ${pay?.slipAt?`<div class="t-xs text-am mt1">📎 ส่งสลิป ${fmtDT(pay.slipAt)}</div>`:''}
           </div>
           <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">
